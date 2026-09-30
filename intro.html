@@ -1,0 +1,1254 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luna Tpx3 GUI &mdash; Luna Tpx3 GUI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Luna Tpx3 GUI" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Luna Tpx3 GUI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Luna Tpx3 GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-it-can-do-worked-examples">What it can do: worked examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#process-a-whole-campaign-folder">1. Process a whole campaign folder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#many-folders-at-once">2. Many folders at once</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#keep-up-with-a-live-campaign-rescan">3. Keep up with a live campaign: Rescan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collect-the-outputs-somewhere-else">4. Collect the outputs somewhere else</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-same-tpx3dump-flags-for-the-whole-batch">5. The same <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> flags for the whole batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redo-some-files-not-all">6. Redo some files, not all</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-the-batch-on-windows-run-it-on-a-linux-machine">7. Build the batch on Windows, run it on a Linux machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tdc-columns-on-every-output">8. TDC columns on every output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#linux">Linux</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-packages">1. System packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-the-launcher">2. Install the launcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-it-runs-at-all">3. Check it runs at all</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#not-showing-up-in-the-applications-menu">4. Not showing up in the applications menu?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#point-it-at-luna">5. Point it at Luna</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#windows">Windows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works-and-why-wsl">How it works, and why WSL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-1-python">Step 1 — Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-2-install-wsl-and-ubuntu">Step 2 — install WSL and Ubuntu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-3-check-the-installation">Step 3 — check the installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#way-1-run-it-from-powershell">Way 1 — run it from PowerShell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#way-2-double-click-no-terminal">Way 2 — double-click, no terminal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-run">First run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#name-templates">Name templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-six-plots">The six plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ctot-is-the-peak-pixel-not-the-cluster-total">ctot is the peak pixel, not the cluster total</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tdc">TDC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-tdc-column">The tdc column</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reading-it-back">Reading it back</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference-edge">Reference edge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot-styling">Plot styling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-layout">Project layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#settings">Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#licence-note">Licence note</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license-and-contact">License and contact</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API (Qt-free core):</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">luna_tpx3_gui</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Luna Tpx3 GUI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Luna Tpx3 GUI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="luna-tpx3-gui">
+<h1>Luna Tpx3 GUI<a class="headerlink" href="#luna-tpx3-gui" title="Link to this heading"></a></h1>
+<p><a class="reference external" href="https://github.com/rngKomorebi/Luna-Tpx3-GUI/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/rngKomorebi/Luna-Tpx3-GUI/actions/workflows/tests.yml/badge.svg" /></a>
+<a class="reference internal" href="#LICENSE"><span class="xref myst"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" /></span></a></p>
+<p>A desktop front end for batch-processing Timepix3 <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> files with ASI
+Luna’s <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>. Point it at one folder or twenty; it finds every <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>
+underneath, names each output after the measurement it came from, and runs
+<code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> over the whole lot. Without it, you type</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tpx3dump<span class="w"> </span>process<span class="w"> </span>-i<span class="w"> </span>INPUT_NAME.tpx3<span class="w"> </span>-o<span class="w"> </span>OUTPUT_NAME.hdf5
+</pre></div>
+</div>
+<p>once per file, with the right paths, the right ASI filename and the
+right working directory.</p>
+<blockquote>
+<div><p><strong>Luna is not included.</strong> This project is only a graphical wrapper around
+ASI Luna’s <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> command-line tool. It contains no part of Luna and
+cannot convert a single <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> file by itself. You need your own licensed
+Luna installation from ASI (Amsterdam Scientific Instruments); the GUI runs
+the <strong>unmodified</strong> <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> from it as a subprocess, through its documented
+command line interface. Every <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code> the GUI produces is exactly what
+<code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> would have written had you typed the command yourself.</p>
+</div></blockquote>
+<p>Who does what:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Job</p></th>
+<th class="head"><p>Done by</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Decoding <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>, clustering, writing the <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code></p></td>
+<td><p><strong>Luna’s <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code></strong>: your copy, not shipped here</p></td>
+</tr>
+<tr class="row-odd"><td><p>Finding the files, naming the outputs, queueing, running, logging</p></td>
+<td><p>this GUI</p></td>
+</tr>
+<tr class="row-even"><td><p>Running the Linux-only <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> from Windows, through WSL</p></td>
+<td><p>this GUI</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reading the <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code> back: summary, plots, TDC columns</p></td>
+<td><p>this GUI (h5py; Luna is not involved)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Built with Qt 6 (PySide6).</p>
+<p><img alt="The Process tab, backend ready" src="_images/process-tab.png" /></p>
+<hr class="docutils" />
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p><strong>Before anything else, have Luna installed</strong> (the Ubuntu build, containing
+<code class="docutils literal notranslate"><span class="pre">bin/tpx3dump</span></code>). None of the options below provides it.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Setup</p></th>
+<th class="head"><p>Launch</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Ubuntu / Linux</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">./install-linux.sh</span></code> — see <a class="reference internal" href="#linux">Linux</a> for the full five steps</p></td>
+<td><p>Activities menu, or <code class="docutils literal notranslate"><span class="pre">./run_gui.sh</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Windows</strong> — way 1</p></td>
+<td><p>install Python, WSL + Ubuntu, then <code class="docutils literal notranslate"><span class="pre">.\install-windows.ps1</span></code> once for the venv</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">run_gui.bat</span></code> from PowerShell</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Windows</strong> — way 2</p></td>
+<td><p>install Python, WSL + Ubuntu, then <code class="docutils literal notranslate"><span class="pre">.\install-windows.ps1</span></code> — builds the venv and the shortcut</p></td>
+<td><p>double-click the Desktop shortcut</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Any, as a package</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[analysis]&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">luna-tpx3-gui</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Windows needs WSL for <strong>every</strong> way — see below for why.</p>
+</section>
+<hr class="docutils" />
+<section id="what-it-can-do-worked-examples">
+<h2>What it can do: worked examples<a class="headerlink" href="#what-it-can-do-worked-examples" title="Link to this heading"></a></h2>
+<p>Every example assumes Luna is already set up (see <a class="reference internal" href="#first-run">First run</a>).
+They all use this campaign layout, which is the one ASI’s acquisition software
+writes: one folder per measurement, with the metadata beside a <code class="docutils literal notranslate"><span class="pre">raw/</span></code> folder
+that holds the <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">:</span>\<span class="n">tpx3cam</span> <span class="n">data</span>\
+  <span class="n">data_DCR_07</span><span class="mf">.08.2026</span>\
+    <span class="n">Measurement_Aug_07_2026_12h52m45s</span>\
+      <span class="n">measurement_metadata</span><span class="o">.</span><span class="n">json</span>
+      <span class="n">comment</span><span class="o">.</span><span class="n">txt</span>
+      <span class="n">raw</span>\
+        <span class="n">fCqk_000000</span><span class="o">.</span><span class="n">tpx3</span>
+    <span class="n">Measurement_Aug_07_2026_13h10m02s</span>\
+      <span class="o">...</span>  <span class="n">raw</span>\<span class="n">fDK5_000000</span><span class="o">.</span><span class="n">tpx3</span>
+    <span class="n">Measurement_Aug_07_2026_14h31m40s</span>\
+      <span class="o">...</span>  <span class="n">raw</span>\<span class="n">gA7p_000000</span><span class="o">.</span><span class="n">tpx3</span>
+  <span class="n">data_TDC_08</span><span class="mf">.08.2026</span>\
+    <span class="n">Measurement_Aug_08_2026_09h05m11s</span>\
+      <span class="o">...</span>  <span class="n">raw</span>\<span class="n">hQ2m_000000</span><span class="o">.</span><span class="n">tpx3</span>
+</pre></div>
+</div>
+<section id="process-a-whole-campaign-folder">
+<h3>1. Process a whole campaign folder<a class="headerlink" href="#process-a-whole-campaign-folder" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Process</strong> tab → <strong>Add folders…</strong> → <strong>Browse…</strong> →
+<code class="docutils literal notranslate"><span class="pre">D:\tpx3cam</span> <span class="pre">data\data_DCR_07.08.2026</span></code>.</p></li>
+<li><p>Leave <strong>Search subfolders</strong> ticked (it is what reaches the <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> inside
+each <code class="docutils literal notranslate"><span class="pre">raw\</span></code>) → <strong>Add to batch</strong>.</p></li>
+<li><p><strong>Run queue</strong>.</p></li>
+</ol>
+<p>The GUI walks the whole tree, queues every <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> it finds (<code class="docutils literal notranslate"><span class="pre">.TPX3</span></code> too), and
+logs what it found:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scanned</span> <span class="mi">1</span> <span class="n">folder</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="mi">3</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">queued</span><span class="p">,</span> <span class="mi">3</span> <span class="n">new</span>
+</pre></div>
+</div>
+<p><strong>Files found</strong> lists each input with the output name it will get. The files
+run one at a time, with <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>’s own output streamed into the log. With
+the default settings each <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code> is written next to its <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>, named after
+the measurement rather than the ASI stem:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Measurement_Aug_07_2026_12h52m45s</span>\<span class="n">raw</span>\
+  <span class="n">fCqk_000000</span><span class="o">.</span><span class="n">tpx3</span>
+  <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_12</span><span class="o">-</span><span class="mi">52</span><span class="o">-</span><span class="mi">45</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">0</span><span class="n">V</span><span class="o">-</span><span class="n">gain_fCqk_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p>The date, time and comment come from <code class="docutils literal notranslate"><span class="pre">measurement_metadata.json</span></code>. See
+<a class="reference internal" href="#name-templates">Name templates</a> for the other fields you can use.</p>
+</section>
+<section id="many-folders-at-once">
+<h3>2. Many folders at once<a class="headerlink" href="#many-folders-at-once" title="Link to this heading"></a></h3>
+<p>In the same <strong>Add folders…</strong> dialog, click <strong>Browse…</strong> repeatedly, or paste
+paths into the box, one per line. Explorer’s <em>Copy as path</em>, quotes and all,
+pastes as-is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">"D:</span><span class="se">\t</span><span class="s2">px3cam data\data_DCR_07.08.2026"</span>
+<span class="s2">"D:</span><span class="se">\t</span><span class="s2">px3cam data\data_TDC_08.08.2026"</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scanned</span> <span class="mi">2</span> <span class="n">folder</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="mi">4</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">queued</span><span class="p">,</span> <span class="mi">4</span> <span class="n">new</span>
+</pre></div>
+</div>
+<p><strong>Folders to process</strong> shows each folder with its <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> count. The list is
+remembered between sessions, so the next time you open the GUI the batch is
+already there. A folder added twice, or a file reachable through two folders,
+is queued only once. <strong>Remove</strong> on a folder drops only the files that folder
+contributed; files you picked by hand with <strong>Add files…</strong> stay.</p>
+</section>
+<section id="keep-up-with-a-live-campaign-rescan">
+<h3>3. Keep up with a live campaign: Rescan<a class="headerlink" href="#keep-up-with-a-live-campaign-rescan" title="Link to this heading"></a></h3>
+<p>A measurement that is still acquiring has no <code class="docutils literal notranslate"><span class="pre">measurement_metadata.json</span></code> yet,
+so it can only be named after its ASI stem. Suppose one appears mid-campaign:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scanned</span> <span class="mi">2</span> <span class="n">folder</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="mi">5</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">queued</span><span class="p">,</span> <span class="mi">1</span> <span class="n">new</span>
+    <span class="o">...</span>\<span class="n">Measurement_Aug_08_2026_09h20m00s</span>\<span class="n">raw</span>\<span class="n">hZ9x_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p>Once it finishes, press <strong>Rescan</strong>. Rescan is a full refresh: it picks up new
+files, drops queued rows whose input has since disappeared, and re-reads the
+metadata for every row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scanned</span> <span class="mi">2</span> <span class="n">folder</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="mi">5</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">queued</span><span class="p">,</span> <span class="mi">1</span> <span class="n">metadata</span> <span class="n">refresh</span><span class="p">(</span><span class="n">es</span><span class="p">)</span>
+    <span class="o">...</span>\<span class="n">Measurement_Aug_08_2026_09h20m00s</span>\<span class="n">raw</span>\<span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">08_09</span><span class="o">-</span><span class="mi">20</span><span class="o">-</span><span class="mi">00</span><span class="n">_laser</span><span class="o">-</span><span class="mi">405</span><span class="n">nm</span><span class="o">-</span><span class="n">TDC_hZ9x_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p>Then <strong>Run queue</strong> again. Because <strong>Skip files whose output already exists</strong> is
+on by default, the files you already processed are marked
+<code class="docutils literal notranslate"><span class="pre">skipped</span> <span class="pre">-</span> <span class="pre">output</span> <span class="pre">exists</span></code> and only the new one runs. <em>Rescan, Run, repeat</em> is
+the whole routine for a running campaign. Only run a measurement once it has
+finished, so <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> never reads a half-written file.</p>
+<p>Rows that are <em>running</em> are never touched by a rescan, because their output
+path is already on the <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> command line. Rows that are <em>done</em> or
+<em>failed</em> are records of something that already happened, so a rescan never
+deletes them.</p>
+</section>
+<section id="collect-the-outputs-somewhere-else">
+<h3>4. Collect the outputs somewhere else<a class="headerlink" href="#collect-the-outputs-somewhere-else" title="Link to this heading"></a></h3>
+<p>By default the outputs stay beside the raw data. The <strong>Advanced</strong> tab →
+<strong>Output</strong> offers two alternatives. Both need an output folder, here
+<code class="docutils literal notranslate"><span class="pre">D:\processed</span></code>.</p>
+<p><strong>Output folder (flat)</strong> puts every <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code> in that one folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">:</span>\<span class="n">processed</span>\
+  <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_12</span><span class="o">-</span><span class="mi">52</span><span class="o">-</span><span class="mi">45</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">0</span><span class="n">V</span><span class="o">-</span><span class="n">gain_fCqk_000000</span><span class="o">.</span><span class="n">hdf5</span>
+  <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_13</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">02</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">0</span><span class="n">V</span><span class="o">-</span><span class="n">gain_fDK5_000000</span><span class="o">.</span><span class="n">hdf5</span>
+  <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_14</span><span class="o">-</span><span class="mi">31</span><span class="o">-</span><span class="mi">40</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">50</span><span class="n">V_gA7p_000000</span><span class="o">.</span><span class="n">hdf5</span>
+  <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">08_09</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">11</span><span class="n">_laser</span><span class="o">-</span><span class="mi">405</span><span class="n">nm</span><span class="o">-</span><span class="n">TDC_hQ2m_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p><strong>Output folder (mirror tree)</strong> rebuilds the campaign structure under it,
+dropping the <code class="docutils literal notranslate"><span class="pre">raw\</span></code> level, which adds nothing once the data is processed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">:</span>\<span class="n">processed</span>\
+  <span class="n">data_DCR_07</span><span class="mf">.08.2026</span>\
+    <span class="n">Measurement_Aug_07_2026_12h52m45s</span>\
+      <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_12</span><span class="o">-</span><span class="mi">52</span><span class="o">-</span><span class="mi">45</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">0</span><span class="n">V</span><span class="o">-</span><span class="n">gain_fCqk_000000</span><span class="o">.</span><span class="n">hdf5</span>
+    <span class="o">...</span>
+  <span class="n">data_TDC_08</span><span class="mf">.08.2026</span>\
+    <span class="n">Measurement_Aug_08_2026_09h05m11s</span>\
+      <span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">08_09</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">11</span><span class="n">_laser</span><span class="o">-</span><span class="mi">405</span><span class="n">nm</span><span class="o">-</span><span class="n">TDC_hQ2m_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p>Missing folders are created as needed. Your <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code> files are never moved,
+renamed or modified.</p>
+<p>If a template makes two inputs produce the same name, both rows are marked
+<code class="docutils literal notranslate"><span class="pre">CLASH</span></code> and skipped rather than one overwriting the other. With
+<code class="docutils literal notranslate"><span class="pre">{date}_{comment}</span></code> in flat mode, for example, <code class="docutils literal notranslate"><span class="pre">fCqk</span></code> and <code class="docutils literal notranslate"><span class="pre">fDK5</span></code> would both
+become <code class="docutils literal notranslate"><span class="pre">2026-08-07_DCR-0V-gain.hdf5</span></code>. Keep <code class="docutils literal notranslate"><span class="pre">{time}</span></code> or <code class="docutils literal notranslate"><span class="pre">{stem}</span></code> in the
+template to avoid this.</p>
+</section>
+<section id="the-same-tpx3dump-flags-for-the-whole-batch">
+<h3>5. The same <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> flags for the whole batch<a class="headerlink" href="#the-same-tpx3dump-flags-for-the-whole-batch" title="Link to this heading"></a></h3>
+<p>On <strong>Advanced</strong> → <strong>tpx3dump flags</strong>, set for example <code class="docutils literal notranslate"><span class="pre">--eps-t</span></code> to <code class="docutils literal notranslate"><span class="pre">100</span></code> and
+tick <code class="docutils literal notranslate"><span class="pre">--disable-clustering</span></code>. The <strong>Process</strong> tab immediately shows an amber
+line, so a non-default run is never a surprise:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Advanced</span><span class="p">:</span> <span class="o">--</span><span class="n">eps</span><span class="o">-</span><span class="n">t</span> <span class="mi">100</span><span class="p">,</span> <span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">clustering</span>
+</pre></div>
+</div>
+<p><strong>Preview commands</strong> prints the exact command line of every queued file
+without running anything. On Windows it reads:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">e</span> <span class="o">/</span><span class="n">mnt</span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="n">Luna</span><span class="o">/</span><span class="n">luna</span><span class="o">-</span><span class="n">tpx3</span><span class="o">-</span><span class="n">ubuntu</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tpx3dump</span> <span class="n">process</span> <span class="o">-</span><span class="n">i</span> <span class="s1">'/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3'</span> <span class="o">-</span><span class="n">o</span> <span class="s1">'/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5'</span> <span class="o">--</span><span class="n">eps</span><span class="o">-</span><span class="n">t</span> <span class="mi">100</span> <span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">clustering</span>
+</pre></div>
+</div>
+<p>Any flag without its own control goes in <strong>extra arguments</strong>. <strong>Check install</strong>
+prints <code class="docutils literal notranslate"><span class="pre">tpx3dump</span> <span class="pre">process</span> <span class="pre">--help</span></code>, the authoritative list for your Luna version.</p>
+</section>
+<section id="redo-some-files-not-all">
+<h3>6. Redo some files, not all<a class="headerlink" href="#redo-some-files-not-all" title="Link to this heading"></a></h3>
+<p>When outputs already exist, <strong>Run queue</strong> skips them. To redo particular
+files, tick <strong>Overwrite</strong> on their rows in <strong>Files found</strong>. The checkbox in the
+column header ticks or clears every row whose output exists. Untick <strong>Skip
+files whose output already exists</strong> on the Advanced tab to overwrite
+everything; the amber line then says <code class="docutils literal notranslate"><span class="pre">OVERWRITING</span> <span class="pre">existing</span> <span class="pre">output</span></code>.</p>
+</section>
+<section id="build-the-batch-on-windows-run-it-on-a-linux-machine">
+<h3>7. Build the batch on Windows, run it on a Linux machine<a class="headerlink" href="#build-the-batch-on-windows-run-it-on-a-linux-machine" title="Link to this heading"></a></h3>
+<p>For a long campaign, you may prefer to run on a Linux workstation or server.
+Build the queue as usual, then <strong>Advanced</strong> → <strong>Export .sh</strong>. You get a
+self-contained script with your paths translated, your flags applied, and
+the input and output roots pulled out into variables to edit on the other
+machine:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="c1"># Generated by Luna Tpx3 GUI (Qt) -- run this on the Linux machine.</span>
+<span class="c1">#</span>
+<span class="c1"># 1. Put the Luna bin/ directory on PATH, or set TPX3DUMP below</span>
+<span class="c1">#    to the absolute path of the tpx3dump executable.</span>
+<span class="c1"># 2. Edit IN_ROOT / OUT_ROOT to match where the data lives there.</span>
+<span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+
+<span class="nv">TPX3DUMP</span><span class="o">=</span><span class="si">${</span><span class="nv">TPX3DUMP</span><span class="k">:-</span><span class="nv">tpx3dump</span><span class="si">}</span>
+<span class="nv">IN_ROOT</span><span class="o">=</span><span class="s1">'/mnt/d/tpx3cam data'</span>
+<span class="nv">OUT_ROOT</span><span class="o">=</span>/mnt/d/processed
+
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>dirname<span class="w"> </span><span class="s2">"</span><span class="nv">$OUT_ROOT</span><span class="s2">"</span>/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5<span class="k">)</span><span class="s2">"</span>
+<span class="s2">"</span><span class="nv">$TPX3DUMP</span><span class="s2">"</span><span class="w"> </span>process<span class="w"> </span>-i<span class="w"> </span><span class="s2">"</span><span class="nv">$IN_ROOT</span><span class="s2">"</span>/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3<span class="w"> </span>-o<span class="w"> </span><span class="s2">"</span><span class="nv">$OUT_ROOT</span><span class="s2">"</span>/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5<span class="w"> </span>--eps-t<span class="w"> </span><span class="m">100</span><span class="w"> </span>--disable-clustering
+...
+</pre></div>
+</div>
+<p>This works even where <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> cannot run, for example on a Windows PC
+without WSL.</p>
+</section>
+<section id="tdc-columns-on-every-output">
+<h3>8. TDC columns on every output<a class="headerlink" href="#tdc-columns-on-every-output" title="Link to this heading"></a></h3>
+<p><strong>Advanced</strong> → <strong>After processing</strong> → tick <strong>Add TDC columns to each output
+.hdf5</strong> and pick the reference edge. After <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> finishes each file, the
+GUI tags every pixel hit and cluster with the TDC edge it follows, in the same
+batch. The row’s note then reads, for example, <code class="docutils literal notranslate"><span class="pre">412.0</span> <span class="pre">MB</span> <span class="pre">in</span> <span class="pre">38.2s,</span> <span class="pre">TDC</span> <span class="pre">TDC1Rising</span> <span class="pre">(1,204,733</span> <span class="pre">rows)</span></code>. See <a class="reference internal" href="#tdc">TDC</a> for what is written and how to
+read it back.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="mf">3.9</span><span class="o">+</span>
+<span class="n">PySide6</span> <span class="o">&gt;=</span> <span class="mf">6.5</span>      <span class="n">required</span>
+<span class="n">h5py</span><span class="p">,</span> <span class="n">numpy</span>         <span class="n">optional</span> <span class="o">--</span> <span class="n">Inspect</span> <span class="n">tab</span><span class="p">,</span> <span class="n">TDC</span> <span class="n">columns</span>
+<span class="n">pandas</span>              <span class="n">optional</span> <span class="o">--</span> <span class="n">the</span> <span class="n">TDC</span> <span class="n">frame</span> <span class="n">preview</span>
+<span class="n">matplotlib</span>          <span class="n">optional</span> <span class="o">--</span> <span class="n">the</span> <span class="n">six</span> <span class="n">plots</span>
+<span class="n">komorebi_mpl</span>        <span class="n">optional</span> <span class="o">--</span> <span class="n">plot</span> <span class="n">styles</span> <span class="p">(</span><span class="n">falls</span> <span class="n">back</span> <span class="n">to</span> <span class="n">the</span> <span class="n">app</span> <span class="n">palette</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> covers all of it; so does
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[analysis]&quot;</span></code>, which also installs the app itself — see
+<a class="reference internal" href="#installing-from-source">Installing from source</a>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="linux">
+<h1>Linux<a class="headerlink" href="#linux" title="Link to this heading"></a></h1>
+<p>Follow these in order. Steps 1 and 2 are what people usually skip, and skipping
+them gives you a launcher that installs cleanly and then does nothing when
+clicked.</p>
+<section id="system-packages">
+<h2>1. System packages<a class="headerlink" href="#system-packages" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-venv<span class="w"> </span>libxcb-cursor0<span class="w"> </span>desktop-file-utils
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">libxcb-cursor0</span></code> — Qt 6.5+ will not open a window without it, and Qt’s own
+error message (<em>“could not load the Qt platform plugin xcb”</em>) does not name
+the package. On a bare install you may also need <code class="docutils literal notranslate"><span class="pre">libxkbcommon-x11-0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">libegl1</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">desktop-file-utils</span></code> — provides <code class="docutils literal notranslate"><span class="pre">desktop-file-validate</span></code>, which is how you
+check the menu entry in step 4. Not strictly required, but without it a
+malformed entry fails silently.</p></li>
+</ul>
+</section>
+<section id="install-the-launcher">
+<h2>2. Install the launcher<a class="headerlink" href="#install-the-launcher" title="Link to this heading"></a></h2>
+<p>From inside the GUI folder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>run_gui.sh<span class="w"> </span>install-linux.sh
+./install-linux.sh
+</pre></div>
+</div>
+<p>With no flags that is the full install, which is what a fresh machine needs:</p>
+<ul class="simple">
+<li><p>a private venv with everything in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> (PySide6, h5py, numpy,
+pandas, matplotlib, komorebi_mpl), which <code class="docutils literal notranslate"><span class="pre">run_gui.sh</span></code> then finds on its own;</p></li>
+<li><p>the Activities-menu launcher;</p></li>
+<li><p>a double-clickable icon on the Desktop.</p></li>
+</ul>
+<p>Everything lands under <code class="docutils literal notranslate"><span class="pre">$HOME</span></code>; no root, nothing system-wide.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>(none)</em></p></td>
+<td><p>venv + menu launcher + Desktop icon</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--no-venv</span></code></p></td>
+<td><p>skip the venv (~450 MB, at <code class="docutils literal notranslate"><span class="pre">~/.local/share/luna-tpx3-gui-qt/venv</span></code>) and use the system <code class="docutils literal notranslate"><span class="pre">python3</span></code> — PySide6 must already be installed, and the script warns if it is not</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--no-desktop-icon</span></code></p></td>
+<td><p>skip the icon on the Desktop; the menu launcher is still installed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--uninstall</span></code></p></td>
+<td><p>remove the launcher, icon and desktop shortcut. Leaves the GUI’s own files and the venv alone.</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">--with-venv</span></code> and <code class="docutils literal notranslate"><span class="pre">--desktop-icon</span></code> from older instructions are still accepted;
+both are now the default.</p>
+<p>Re-running is safe; it overwrites the entry. If you move the folder, run it
+again so the launcher points at the new path.</p>
+</section>
+<section id="check-it-runs-at-all">
+<h2>3. Check it runs at all<a class="headerlink" href="#check-it-runs-at-all" title="Link to this heading"></a></h2>
+<p>Before worrying about the menu, prove the app itself starts:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./run_gui.sh
+</pre></div>
+</div>
+<p>If a window opens, the launcher problem is purely a menu problem. If it does
+not, you are missing PySide6 or <code class="docutils literal notranslate"><span class="pre">libxcb-cursor0</span></code> — <code class="docutils literal notranslate"><span class="pre">run_gui.sh</span></code> says which, in
+a dialog if it can and on stderr regardless.</p>
+<p><code class="docutils literal notranslate"><span class="pre">run_gui.sh</span></code> picks its interpreter in this order: <code class="docutils literal notranslate"><span class="pre">$PYTHON</span></code>, a <code class="docutils literal notranslate"><span class="pre">.venv</span></code> beside
+the script, the venv <code class="docutils literal notranslate"><span class="pre">install-linux.sh</span></code> built, then the system <code class="docutils literal notranslate"><span class="pre">python3</span></code>.</p>
+</section>
+<section id="not-showing-up-in-the-applications-menu">
+<h2>4. Not showing up in the applications menu?<a class="headerlink" href="#not-showing-up-in-the-applications-menu" title="Link to this heading"></a></h2>
+<p>Work down this list; each step tells you something the previous one could not.</p>
+<p><strong>Is the file there?</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>-l<span class="w"> </span>~/.local/share/applications/luna-tpx3-gui-qt.desktop
+</pre></div>
+</div>
+<p>If it is missing, the installer failed — re-run it and read the output. It
+reports the path it wrote and exits with an error if the write did not happen.</p>
+<p><strong>Is it well-formed?</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>desktop-file-validate<span class="w"> </span>~/.local/share/applications/luna-tpx3-gui-qt.desktop<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>VALID
+</pre></div>
+</div>
+<p>This is the one that finds real problems. A menu silently ignores an entry it
+cannot parse, which looks identical to “the menu has not refreshed yet”.</p>
+<p><strong>Does the menu know about it?</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>update-desktop-database<span class="w"> </span>~/.local/share/applications
+</pre></div>
+</div>
+<p><strong>Is <code class="docutils literal notranslate"><span class="pre">$HOME/.local/share</span></code> even on the search path?</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">XDG_DATA_HOME</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/.local/share</span><span class="si">}</span><span class="s2">"</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$XDG_DATA_DIRS</span><span class="s2">"</span>
+</pre></div>
+</div>
+<p>The installer honours <code class="docutils literal notranslate"><span class="pre">XDG_DATA_HOME</span></code>. If yours points somewhere unusual, that
+is where the entry went.</p>
+<p><strong>Still nothing?</strong> Log out and back in. GNOME normally notices a new entry
+within seconds, but a stuck shell needs a fresh session — and on Wayland the
+old <code class="docutils literal notranslate"><span class="pre">Alt+F2</span></code> → <code class="docutils literal notranslate"><span class="pre">r</span></code> trick is not available, so logging out is the only way.</p>
+<p>Search for <strong>Luna</strong> — the entry is named <em>Luna Tpx3 GUI (Qt)</em>.</p>
+<blockquote>
+<div><p>If you are on a version of this GUI from before this section existed and the
+entry validates as broken at the <code class="docutils literal notranslate"><span class="pre">Exec=</span></code> line, that is a fixed bug: the
+folder name contains spaces, and the path has to be quoted inside the
+<code class="docutils literal notranslate"><span class="pre">.desktop</span></code> file. Re-running the current <code class="docutils literal notranslate"><span class="pre">install-linux.sh</span></code> rewrites it
+correctly.</p>
+</div></blockquote>
+</section>
+<section id="point-it-at-luna">
+<h2>5. Point it at Luna<a class="headerlink" href="#point-it-at-luna" title="Link to this heading"></a></h2>
+<p>On Linux the Luna binary runs directly — backend <code class="docutils literal notranslate"><span class="pre">native</span></code>, nothing else to set
+up. Make sure it is executable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>/path/to/luna-tpx3-.../bin/tpx3dump
+</pre></div>
+</div>
+<p>Then in the GUI: <strong>Advanced</strong> tab → browse to the folder containing
+<code class="docutils literal notranslate"><span class="pre">bin/tpx3dump</span></code> → <strong>Check install</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="windows">
+<h1>Windows<a class="headerlink" href="#windows" title="Link to this heading"></a></h1>
+<section id="how-it-works-and-why-wsl">
+<h2>How it works, and why WSL<a class="headerlink" href="#how-it-works-and-why-wsl" title="Link to this heading"></a></h2>
+<p>The Luna download is the Ubuntu build. Its binaries are Linux ELF executables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">bin</span><span class="o">/</span><span class="n">tpx3dump</span><span class="p">:</span>  <span class="n">ELF</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="n">LSB</span> <span class="n">executable</span><span class="p">,</span> <span class="n">x86</span><span class="o">-</span><span class="mi">64</span><span class="p">,</span>
+               <span class="n">interpreter</span> <span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">ld</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86</span><span class="o">-</span><span class="mf">64.</span><span class="n">so</span><span class="mf">.2</span>
+</pre></div>
+</div>
+<p>Windows cannot run that. So the split is:</p>
+<ul class="simple">
+<li><p><strong>The GUI runs natively on Windows</strong>, as a normal Python/Qt app.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> runs inside WSL</strong>, launched as <code class="docutils literal notranslate"><span class="pre">wsl.exe</span> <span class="pre">-e</span> <span class="pre">/mnt/c/...</span></code>, with
+Windows paths translated to <code class="docutils literal notranslate"><span class="pre">/mnt/&lt;drive&gt;/...</span></code> automatically.</p></li>
+</ul>
+<p>You never open the Ubuntu shell yourself. The GUI drives it.</p>
+<p>Without WSL the GUI still starts and everything except <em>running</em> works — build
+the queue, preview the commands, <strong>Export .sh</strong> to run on an Ubuntu box.</p>
+</section>
+<section id="step-1-python">
+<h2>Step 1 — Python<a class="headerlink" href="#step-1-python" title="Link to this heading"></a></h2>
+<p>Install Python 3.9 or newer from <a class="reference external" href="https://www.python.org/downloads/">python.org</a>,
+keeping the <em>py launcher</em> option ticked. That is all you install by hand:
+<code class="docutils literal notranslate"><span class="pre">.\install-windows.ps1</span></code> (<a class="reference internal" href="#way-2-double-click-no-terminal">Way 2</a>) builds a
+private venv at <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\venvs\luna-tpx3-gui</span></code> with everything in
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_gui.bat</span></code> (Way 1) uses that same venv.</p>
+<p>To use an interpreter of your own instead, install the dependencies into it:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">py</span> <span class="p">-</span><span class="n">3</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">py</span> <span class="p">-</span><span class="n">3</span> <span class="n">-c</span> <span class="s2">"import PySide6, h5py, numpy, matplotlib; print('ok')"</span>
+</pre></div>
+</div>
+</section>
+<section id="step-2-install-wsl-and-ubuntu">
+<h2>Step 2 — install WSL and Ubuntu<a class="headerlink" href="#step-2-install-wsl-and-ubuntu" title="Link to this heading"></a></h2>
+<p>In PowerShell (no administrator rights needed with current WSL):</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="p">-</span><span class="n">-install</span> <span class="n">-d</span> <span class="n">Ubuntu</span>
+</pre></div>
+</div>
+<p>It downloads ~500 MB and then asks for a UNIX username and password. These are
+new credentials for the Linux system, unrelated to your Windows account. On
+older Windows builds WSL may ask for a reboot; current ones do not.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code> gives you the newest LTS. Luna is built for Ubuntu 20.04, which
+Microsoft no longer offers, but that is fine: <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> links only against
+core glibc and libgcc —</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">libgcc_s</span><span class="o">.</span><span class="n">so</span><span class="mf">.1</span>  <span class="n">libpthread</span><span class="o">.</span><span class="n">so</span><span class="mf">.0</span>  <span class="n">libm</span><span class="o">.</span><span class="n">so</span><span class="mf">.6</span>  <span class="n">libdl</span><span class="o">.</span><span class="n">so</span><span class="mf">.2</span>  <span class="n">libc</span><span class="o">.</span><span class="n">so</span><span class="mf">.6</span>
+</pre></div>
+</div>
+<p>— and glibc is forward-compatible, so a 20.04 build runs unchanged on 24.04.
+<strong>No extra <code class="docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span></code> is needed.</strong> If you would rather stay close to the
+build target, <code class="docutils literal notranslate"><span class="pre">wsl</span> <span class="pre">--install</span> <span class="pre">-d</span> <span class="pre">Ubuntu-22.04</span></code> also works.</p>
+</section>
+<section id="step-3-check-the-installation">
+<h2>Step 3 — check the installation<a class="headerlink" href="#step-3-check-the-installation" title="Link to this heading"></a></h2>
+<p>Three checks, each answering a different question.</p>
+<p><strong>Is a distribution installed and running?</strong></p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="p">-</span><span class="n">-list</span> <span class="p">-</span><span class="n">-verbose</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">NAME</span>      <span class="n">STATE</span>      <span class="n">VERSION</span>
+<span class="o">*</span> <span class="n">Ubuntu</span>    <span class="n">Running</span>    <span class="mi">2</span>
+</pre></div>
+</div>
+<p><strong>Can WSL execute the Luna binary?</strong> Give it the <code class="docutils literal notranslate"><span class="pre">/mnt/...</span></code> form of your own
+Luna path:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="n">-e</span> <span class="p">/</span><span class="n">mnt</span><span class="p">/</span><span class="n">c</span><span class="p">/</span><span class="n">Users</span><span class="p">/&lt;</span><span class="n">you</span><span class="p">&gt;/</span><span class="n">path</span><span class="p">/</span><span class="n">to</span><span class="p">/</span><span class="n">luna-tpx3</span><span class="p">-.../</span><span class="n">bin</span><span class="p">/</span><span class="n">tpx3dump</span> <span class="p">-</span><span class="n">-version</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Tpx3Dump</span> <span class="mf">0.3.2</span>
+</pre></div>
+</div>
+<p>If that prints a version, the backend works. No <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">+x</span></code> is needed — <code class="docutils literal notranslate"><span class="pre">/mnt/c</span></code>
+is mounted with everything executable.</p>
+<p><strong>Can WSL see your data?</strong> For data on <code class="docutils literal notranslate"><span class="pre">D:</span></code>:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="n">-e</span> <span class="nb">ls </span><span class="s2">"/mnt/d/tpx3cam data"</span>
+</pre></div>
+</div>
+<p>WSL auto-mounts <strong>fixed</strong> disks only. A USB stick, card reader or other
+removable drive never appears under <code class="docutils literal notranslate"><span class="pre">/mnt</span></code>, so <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> cannot open anything
+stored on it – it logs <code class="docutils literal notranslate"><span class="pre">Skipping</span> <span class="pre">file</span> <span class="pre">...</span> <span class="pre">as</span> <span class="pre">it</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">have</span> <span class="pre">&quot;Tpx3&quot;</span> <span class="pre">extension</span> <span class="pre">and</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">a</span> <span class="pre">directory</span></code> and then panics with <code class="docutils literal notranslate"><span class="pre">index</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">bounds:</span> <span class="pre">the</span> <span class="pre">len</span> <span class="pre">is</span> <span class="pre">0</span></code>.
+The GUI checks for this before a run and offers to mount the drive for you; the
+equivalent by hand, for <code class="docutils literal notranslate"><span class="pre">E:</span></code>, is</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="n">-u</span> <span class="n">root</span> <span class="n">-e</span> <span class="n">bash</span> <span class="n">-c</span> <span class="s2">"mkdir -p /mnt/e &amp;&amp; mount -t drvfs E: /mnt/e"</span>
+</pre></div>
+</div>
+<p>No password is needed, and the mount lasts until WSL next shuts down.</p>
+<p><strong>From inside the GUI:</strong> <em>Advanced</em> tab → <strong>Check install</strong>. It re-detects the
+backend, then runs <code class="docutils literal notranslate"><span class="pre">tpx3dump</span> <span class="pre">--version</span></code> and <code class="docutils literal notranslate"><span class="pre">tpx3dump</span> <span class="pre">process</span> <span class="pre">--help</span></code> and dumps
+both into the log. No restart is needed after installing WSL.</p>
+<p>A correct setup looks like this — the folder pointing at <code class="docutils literal notranslate"><span class="pre">bin/</span></code>, and a green
+<code class="docutils literal notranslate"><span class="pre">OK</span></code> line naming the backend and the translated <code class="docutils literal notranslate"><span class="pre">/mnt/c/...</span></code> path:</p>
+<p><img alt="Luna installation configured, backend OK via WSL" src="_images/luna-setup-ok.png" /></p>
+<p>If that line is amber or red it says why: no Luna folder set, no <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>
+under it, or no WSL distribution installed. The Process tab then reads
+<em>“Ready - tpx3dump runs through WSL.”</em></p>
+</section>
+<section id="way-1-run-it-from-powershell">
+<h2>Way 1 — run it from PowerShell<a class="headerlink" href="#way-1-run-it-from-powershell" title="Link to this heading"></a></h2>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd </span><span class="s2">"C:\path\to\Luna Tpx3 GUI"</span>
+<span class="p">.\</span><span class="n">run_gui</span><span class="p">.</span><span class="n">bat</span>
+</pre></div>
+</div>
+<p>or, from anywhere, in one line:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">&amp;</span> <span class="s2">"C:\path\to\Luna Tpx3 GUI\run_gui.bat"</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> is PowerShell’s call operator, needed whenever the command is a quoted
+string. The <code class="docutils literal notranslate"><span class="pre">.bat</span></code> picks its interpreter in this order: <code class="docutils literal notranslate"><span class="pre">%LUNA_PYTHON%</span></code>, a
+<code class="docutils literal notranslate"><span class="pre">.venv</span></code> beside it, the venv <code class="docutils literal notranslate"><span class="pre">install-windows.ps1</span></code> builds
+(<code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\venvs\luna-tpx3-gui</span></code>), <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\venvs\tpx4cam</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">py</span> <span class="pre">-3</span></code>. If you gave the installer a different <code class="docutils literal notranslate"><span class="pre">-VenvName</span></code>, point
+<code class="docutils literal notranslate"><span class="pre">LUNA_PYTHON</span></code> at that venv’s <code class="docutils literal notranslate"><span class="pre">python.exe</span></code>.</p>
+<p>It uses <code class="docutils literal notranslate"><span class="pre">python.exe</span></code> deliberately, so a startup error stays readable in the
+console. Do not close that console while the GUI is running — it kills the GUI.</p>
+</section>
+<section id="way-2-double-click-no-terminal">
+<h2>Way 2 — double-click, no terminal<a class="headerlink" href="#way-2-double-click-no-terminal" title="Link to this heading"></a></h2>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="nb">install-windows</span><span class="p">.</span><span class="n">ps1</span>
+</pre></div>
+</div>
+<p>That builds a private venv with everything in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> at
+<code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;you&gt;\venvs\luna-tpx3-gui</span></code> (~450 MB), then creates a <strong>Luna Tpx3
+GUI</strong> shortcut on your Desktop. Double-click it and the app starts — no
+PowerShell, no <code class="docutils literal notranslate"><span class="pre">cd</span></code>, no console window, and WSL still gets driven underneath
+exactly as before. No administrator rights are needed.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>(none)</em></p></td>
+<td><p>venv + Desktop shortcut</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-StartMenu</span></code></p></td>
+<td><p>also add it to the Start Menu, so it is searchable</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-VenvName</span> <span class="pre">&lt;name&gt;</span></code></p></td>
+<td><p>build the venv at <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\venvs\&lt;name&gt;</span></code> instead</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-NoVenv</span></code></p></td>
+<td><p>skip the venv and use a Python that already has PySide6 (an earlier venv, <code class="docutils literal notranslate"><span class="pre">venvs\tpx4cam</span></code>, or <code class="docutils literal notranslate"><span class="pre">pythonw.exe</span></code> on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-Python</span> <span class="pre">&lt;path&gt;</span></code></p></td>
+<td><p>use this specific <code class="docutils literal notranslate"><span class="pre">pythonw.exe</span></code>; implies <code class="docutils literal notranslate"><span class="pre">-NoVenv</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-Uninstall</span></code></p></td>
+<td><p>remove the shortcuts. Leaves the GUI’s own files and the venv alone.</p></td>
+</tr>
+</tbody>
+</table>
+<p>What it does: builds the venv from whichever Python 3.9+ the <code class="docutils literal notranslate"><span class="pre">py</span></code> launcher
+finds (re-running reuses it and brings its packages up to date), checks that
+the interpreter can actually <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">PySide6</span></code> — this matters, since
+<code class="docutils literal notranslate"><span class="pre">pythonw.exe</span></code> has no console and an import error would be silent — and writes
+a <code class="docutils literal notranslate"><span class="pre">.lnk</span></code> pointing at the venv’s <code class="docutils literal notranslate"><span class="pre">pythonw.exe</span></code>. Right-click the shortcut →
+<em>Pin to taskbar</em> if you want it permanently to hand.</p>
+<p>After updating the GUI (a new release, or <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>), re-run
+<code class="docutils literal notranslate"><span class="pre">.\install-windows.ps1</span></code> if <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> changed; otherwise the shortcut
+already runs the new code.</p>
+<p>There is deliberately no standalone <code class="docutils literal notranslate"><span class="pre">.exe</span></code> — see the
+<a class="reference internal" href="#licence-note">Licence note</a>.</p>
+</section>
+<hr class="docutils" />
+<section id="first-run">
+<h2>First run<a class="headerlink" href="#first-run" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Open the <strong>Advanced</strong> tab (or press <em>Set up Luna…</em> on the Process tab) and
+browse to the folder containing <code class="docutils literal notranslate"><span class="pre">bin/tpx3dump</span></code> — either the install root or
+the <code class="docutils literal notranslate"><span class="pre">bin</span></code> folder itself works. It is remembered, so this is a one-time step.</p></li>
+<li><p><strong>Check install</strong> proves the backend works and prints the authoritative flag
+list for the <em>extra arguments</em> box.</p></li>
+<li><p>Back on <strong>Process</strong>, the status line reads <em>Ready</em> and the setup button
+disappears. From then on you never need the Advanced tab again.</p></li>
+</ol>
+<p>Everything on the Advanced tab is optional — this is what it looks like once
+Luna is configured:</p>
+<p><img alt="The Advanced tab with Luna configured" src="_images/advanced-tab.png" /></p>
+</section>
+<hr class="docutils" />
+<section id="layout">
+<h2>Layout<a class="headerlink" href="#layout" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tab</p></th>
+<th class="head"><p>What it is for</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Process</strong></p></td>
+<td><p>The whole everyday job: add input, press Run, watch the log. Deliberately has nothing else on it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Advanced</strong></p></td>
+<td><p>Luna folder, output placement, renaming, <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> flags, command preview, script export. All optional.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Inspect HDF5</strong></p></td>
+<td><p>Look inside a result — datasets, counts, ToA range, TDC edges, six plots, and the button that writes the TDC columns. See below.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Left alone, the Process tab runs exactly</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tpx3dump<span class="w"> </span>process<span class="w"> </span>-i<span class="w"> </span>NAME.tpx3<span class="w"> </span>-o<span class="w"> </span>NAME.hdf5
+</pre></div>
+</div>
+<p>per queued file, writing the <code class="docutils literal notranslate"><span class="pre">.hdf5</span></code> next to its <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>. Any deviation raises
+an amber summary line on the Process tab — relocation, renaming, overwriting,
+and every flag passed. Silently renamed or relocated output is the one surprise
+worth never having.</p>
+<p>Folder scanning, Rescan, output placement and the rest are walked through in
+<a class="reference internal" href="#what-it-can-do-worked-examples">What it can do</a>.</p>
+<p>Theme is a Light/Dark pair of buttons in the header, remembered between runs.</p>
+</section>
+<section id="name-templates">
+<h2>Name templates<a class="headerlink" href="#name-templates" title="Link to this heading"></a></h2>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">{date}_{time}_{comment}_{stem}</span></code>, built from
+<code class="docutils literal notranslate"><span class="pre">measurement_metadata.json</span></code> and <code class="docutils literal notranslate"><span class="pre">comment.txt</span></code> in the measurement folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">07_12</span><span class="o">-</span><span class="mi">52</span><span class="o">-</span><span class="mi">45</span><span class="n">_DCR</span><span class="o">-</span><span class="mi">0</span><span class="n">V</span><span class="o">-</span><span class="n">gain_fCqk_000000</span><span class="o">.</span><span class="n">hdf5</span>
+</pre></div>
+</div>
+<p>The time is in there because a campaign routinely puts many measurements in one
+day under the same comment — on 2026-08-07 alone, <code class="docutils literal notranslate"><span class="pre">fCqk_000000</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fDK5_000000</span></code> are both <code class="docutils literal notranslate"><span class="pre">DCR-0V-gain</span></code>, and without <code class="docutils literal notranslate"><span class="pre">{time}</span></code> the only thing
+telling them apart is the ASI stem. <code class="docutils literal notranslate"><span class="pre">{time}</span></code> is written <code class="docutils literal notranslate"><span class="pre">12-52-45</span></code>, not
+<code class="docutils literal notranslate"><span class="pre">12:52:45</span></code>, because a colon is not legal in a Windows filename.</p>
+<p>Changing this default migrates an existing config <strong>only</strong> if its template is
+still one this program shipped as a default. A template you chose yourself is
+never overwritten.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Placeholder</p></th>
+<th class="head"><p>Example</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{stem}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fCqk_000000</span></code></p></td>
+<td><p>filename</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{measurement}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Measurement_Aug_07_2026_12h52m45s</span></code></p></td>
+<td><p>folder</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{campaign}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_DCR_07.08.2026</span></code></p></td>
+<td><p>folder</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{date}</span></code> <code class="docutils literal notranslate"><span class="pre">{time}</span></code> <code class="docutils literal notranslate"><span class="pre">{datetime}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2026-08-07</span></code>, <code class="docutils literal notranslate"><span class="pre">12-52-45</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StartDateTime</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{duration}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">10s</span></code></p></td>
+<td><p>Stop − Start</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{comment}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DCR-0V-gain</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CommentAtTimeOfMeasurement</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{bias}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">50</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BiasVoltage</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{exposure}</span></code> <code class="docutils literal notranslate"><span class="pre">{ntrig}</span></code> <code class="docutils literal notranslate"><span class="pre">{frames}</span></code> <code class="docutils literal notranslate"><span class="pre">{period}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.01</span></code>, <code class="docutils literal notranslate"><span class="pre">100</span></code>, <code class="docutils literal notranslate"><span class="pre">100</span></code>, <code class="docutils literal notranslate"><span class="pre">0.1</span></code></p></td>
+<td><p>metadata</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{polarity}</span></code> <code class="docutils literal notranslate"><span class="pre">{trigmode}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Positive</span></code>, <code class="docutils literal notranslate"><span class="pre">AUTOTRIGSTART_TIMERSTOP</span></code></p></td>
+<td><p>metadata</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{size}</span></code> <code class="docutils literal notranslate"><span class="pre">{chip}</span></code> <code class="docutils literal notranslate"><span class="pre">{chipboard}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">256x256</span></code>, <code class="docutils literal notranslate"><span class="pre">W0028_H11</span></code>, <code class="docutils literal notranslate"><span class="pre">2000050</span></code></p></td>
+<td><p>metadata</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{thr_coarse}</span></code> <code class="docutils literal notranslate"><span class="pre">{thr_fine}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6</span></code>, <code class="docutils literal notranslate"><span class="pre">246</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DACs[]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Placeholders with no value drop out and the separators collapse. If two inputs
+would produce the same output name, both rows are marked <code class="docutils literal notranslate"><span class="pre">CLASH</span></code> and skipped —
+a rename tool that silently overwrites half your batch is worse than none.</p>
+</section>
+<section id="the-six-plots">
+<h2>The six plots<a class="headerlink" href="#the-six-plots" title="Link to this heading"></a></h2>
+<p><img alt="The Inspect HDF5 tab" src="_images/inspect-tab.png" /></p>
+<p>All six read the HDF5 in slices, so multi-GB files do not exhaust memory, and
+each opens in its own modeless window — several can be compared side by side.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Plot</p></th>
+<th class="head"><p>Source</p></th>
+<th class="head"><p>Binning / scale</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Hitmap, pixels</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PixelHits</span></code> <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code></p></td>
+<td><p>counts per pixel</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Hitmap, clusters</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Clusters</span></code> <code class="docutils literal notranslate"><span class="pre">cx</span></code>, <code class="docutils literal notranslate"><span class="pre">cy</span></code></p></td>
+<td><p>cluster centroids per pixel</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ToT, peak pixel</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Clusters</span></code> <code class="docutils literal notranslate"><span class="pre">ctot</span></code></p></td>
+<td><p>25 ns bins, step outline, log y</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>ToT, cluster total</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Clusters</span></code> <code class="docutils literal notranslate"><span class="pre">sum_tot</span></code></p></td>
+<td><p>~300 bins snapped to 25 ns ticks, log y</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Cluster size histogram</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Clusters</span></code> <code class="docutils literal notranslate"><span class="pre">size</span></code></p></td>
+<td><p>40 bins over 0–40, linear y</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Time since TDC edge</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Clusters</span></code> <code class="docutils literal notranslate"><span class="pre">ctoa</span></code> − <code class="docutils literal notranslate"><span class="pre">TDCEvents</span></code></p></td>
+<td><p>200 bins over one trigger period, log y</p></td>
+</tr>
+</tbody>
+</table>
+<section id="ctot-is-the-peak-pixel-not-the-cluster-total">
+<h3>ctot is the peak pixel, not the cluster total<a class="headerlink" href="#ctot-is-the-peak-pixel-not-the-cluster-total" title="Link to this heading"></a></h3>
+<p>Worth knowing before reading either ToT plot. Checked against <code class="docutils literal notranslate"><span class="pre">PixelHits</span></code> for
+every one of the 692,239 clusters in the reference file, with no exceptions:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>What it actually holds</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ctot</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">max(tot)</span></code> over the cluster’s hits — the <strong>peak pixel</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sum_tot</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sum(tot)</span></code> over the cluster’s hits — the <strong>total</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">size</span></code></p></td>
+<td><p>number of hits in the cluster</p></td>
+</tr>
+</tbody>
+</table>
+<p>The giveaway is that <code class="docutils literal notranslate"><span class="pre">ctot</span></code> saturates at 14 425 ns, exactly the single-pixel
+<code class="docutils literal notranslate"><span class="pre">tot</span></code> maximum. Plotted against cluster size the two behave quite differently:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>Pearson r</p></th>
+<th class="head"><p>median at size 1</p></th>
+<th class="head"><p>median at size 40</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ctot</span></code></p></td>
+<td><p>0.775</p></td>
+<td><p>100 ns</p></td>
+<td><p>6 775 ns</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sum_tot</span></code></p></td>
+<td><p><strong>0.954</strong></p></td>
+<td><p>100 ns</p></td>
+<td><p><strong>43 450 ns</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">ctot</span></code> climbs steeply to about size 9 and then flattens — beyond that, extra
+charge spreads into more pixels rather than driving the central one higher, so
+the peak pixel saturates. <code class="docutils literal notranslate"><span class="pre">sum_tot</span></code> stays linear the whole way, as a
+deposited-charge proxy should.</p>
+<p>Use <strong>cluster total</strong> for deposited charge, <strong>peak pixel</strong> for threshold and
+gain studies where the saturation is the point.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><img alt="Hitmap, pixels" src="_images/plot-hitmap-pixels.png" /></p></td>
+<td><p><img alt="Hitmap, clusters" src="_images/plot-hitmap-clusters.png" /></p></td>
+</tr>
+<tr class="row-odd"><td><p><img alt="ToT, peak pixel" src="_images/plot-tot.png" /></p></td>
+<td><p><img alt="ToT, cluster total" src="_images/plot-sumtot.png" /></p></td>
+</tr>
+<tr class="row-even"><td><p><img alt="Cluster size histogram" src="_images/plot-cluster-size.png" /></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p>The two hitmaps answer different questions and are worth comparing: the pixel
+map shows the raw illumination including cluster spread, while the cluster map
+counts each event once at its centroid and so comes out visibly flatter.</p>
+<p>The cluster size histogram is capped at 40 pixels because that is where the
+distribution lives; anything above is counted and stated in the plot title
+rather than dropped without saying so.</p>
+</section>
+</section>
+<section id="tdc">
+<h2>TDC<a class="headerlink" href="#tdc" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> records every TDC edge it saw in <code class="docutils literal notranslate"><span class="pre">/TDCEvents</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tdc_type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> <code class="docutils literal notranslate"><span class="pre">TDC1Rising</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code> <code class="docutils literal notranslate"><span class="pre">TDC1Falling</span></code>, <code class="docutils literal notranslate"><span class="pre">3</span></code> <code class="docutils literal notranslate"><span class="pre">TDC2Rising</span></code>, <code class="docutils literal notranslate"><span class="pre">4</span></code> <code class="docutils literal notranslate"><span class="pre">TDC2Falling</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trigger_count</span></code></p></td>
+<td><p>the trigger counter that came with the edge</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">timestamp</span></code></p></td>
+<td><p>100 fs ticks — the <strong>same clock</strong> as <code class="docutils literal notranslate"><span class="pre">PixelHits/toa</span></code> and <code class="docutils literal notranslate"><span class="pre">Clusters/ctoa</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Two things about that dataset are easy to get wrong, so the GUI handles both.</p>
+<p><strong>Every chip repeats the packet.</strong> A quad carries each physical edge four times
+and an octal eight, so a 40-row <code class="docutils literal notranslate"><span class="pre">/TDCEvents</span></code> in a quad file describes ten
+triggers, not forty. Everything here deduplicates on <code class="docutils literal notranslate"><span class="pre">(tdc_type,</span> <span class="pre">timestamp)</span></code>
+first — the same thing ASI’s <code class="docutils literal notranslate"><span class="pre">read_tdcs.py</span></code> does. The Inspect summary reports
+both numbers so the difference is never a surprise:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TDC</span>            <span class="mi">10</span> <span class="n">edge</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">40</span> <span class="n">raw</span> <span class="n">records</span><span class="p">;</span> <span class="n">every</span> <span class="n">chip</span> <span class="n">repeats</span> <span class="n">the</span> <span class="n">packet</span><span class="p">)</span>
+   <span class="mi">5</span> <span class="n">TDC1Rising</span><span class="p">,</span> <span class="mi">5</span> <span class="n">TDC1Falling</span>
+   <span class="n">TDC1Rising</span>   <span class="mi">5</span> <span class="n">edges</span><span class="p">,</span> <span class="n">period</span> <span class="mf">100.410</span> <span class="n">us</span> <span class="p">(</span><span class="o">+-</span> <span class="mf">0.0</span> <span class="n">ns</span><span class="p">)</span>
+   <span class="n">TDC1Falling</span>  <span class="mi">5</span> <span class="n">edges</span><span class="p">,</span> <span class="n">period</span> <span class="mf">100.410</span> <span class="n">us</span> <span class="p">(</span><span class="o">+-</span> <span class="mf">0.3</span> <span class="n">ns</span><span class="p">)</span>
+   <span class="n">span</span>         <span class="mf">0.453</span> <span class="n">ms</span>
+</pre></div>
+</div>
+<p><strong>The timestamps share the hit clock</strong>, which is what makes “which trigger does
+this cluster belong to” a subtraction rather than a guess.</p>
+<section id="the-tdc-column">
+<h3>The tdc column<a class="headerlink" href="#the-tdc-column" title="Link to this heading"></a></h3>
+<p><strong>Inspect HDF5 → Add TDC columns to this file</strong> tags every pixel hit and every
+cluster with the TDC edge it follows, and writes the result back into the same
+<code class="docutils literal notranslate"><span class="pre">.hdf5</span></code>. On the Advanced tab, <strong>Add TDC columns to each output .hdf5</strong> does it
+automatically for every file the batch produces.</p>
+<p>The columns land in two new datasets, <code class="docutils literal notranslate"><span class="pre">/PixelHitsTDC</span></code> and <code class="docutils literal notranslate"><span class="pre">/ClustersTDC</span></code>, each
+row-aligned 1:1 with the dataset it describes:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tdc</span></code></p></td>
+<td><p>timestamp of the reference edge this row follows, in 100 fs ticks</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tdc_dt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">toa</span></code> (or <code class="docutils literal notranslate"><span class="pre">ctoa</span></code>) − <code class="docutils literal notranslate"><span class="pre">tdc</span></code>, same ticks</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tdc_index</span></code></p></td>
+<td><p>row in the deduplicated TDC table</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tdc_trigger</span></code></p></td>
+<td><p>that edge’s <code class="docutils literal notranslate"><span class="pre">trigger_count</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tdc_type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code>–<code class="docutils literal notranslate"><span class="pre">4</span></code> as above</p></td>
+</tr>
+</tbody>
+</table>
+<p>Rows that arrive <strong>before the first reference edge</strong> have nothing to measure
+from and carry <code class="docutils literal notranslate"><span class="pre">-1</span></code>, which is the sentinel <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> itself uses in
+<code class="docutils literal notranslate"><span class="pre">PixelHits/tof</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PixelHits</span></code>, <code class="docutils literal notranslate"><span class="pre">Clusters</span></code> and <code class="docutils literal notranslate"><span class="pre">TDCEvents</span></code> are never rewritten. An HDF5 compound
+dataset has a fixed dtype, so a genuine extra field would mean recreating the
+whole thing — and these files are the only copy of the measurement. Writing
+beside them is additive and reversible; the GUI also stamps what it wrote and
+refuses to replace a <code class="docutils literal notranslate"><span class="pre">/ClustersTDC</span></code> it did not write itself.</p>
+<p>Cost is small: the columns are chunked and gzipped, and since <code class="docutils literal notranslate"><span class="pre">tdc</span></code> and
+<code class="docutils literal notranslate"><span class="pre">tdc_trigger</span></code> are constant across a whole trigger’s worth of rows they
+compress well — on the ASI example file the stored columns come to 3.5 bytes
+per pixel hit and 4.0 per cluster, against 23 uncompressed.</p>
+</section>
+<section id="reading-it-back">
+<h3>Reading it back<a class="headerlink" href="#reading-it-back" title="Link to this heading"></a></h3>
+<p><strong>Preview frame</strong> shows the first 40 rows of what you get. From Python, the
+package is importable and the three functions take no Qt (importing
+<code class="docutils literal notranslate"><span class="pre">luna_tpx3_gui</span></code> does not load PySide6 at all):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">luna_tpx3_gui</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">g</span>
+
+<span class="n">g</span><span class="o">.</span><span class="n">read_tdcs</span><span class="p">(</span><span class="s2">"run.hdf5"</span><span class="p">)</span>                    <span class="c1"># the edges, deduplicated</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_tdc_columns</span><span class="p">(</span><span class="s2">"run.hdf5"</span><span class="p">,</span> <span class="s2">"TDC1Rising"</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">read_with_tdc</span><span class="p">(</span><span class="s2">"run.hdf5"</span><span class="p">,</span> <span class="s2">"Clusters"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">read_with_tdc</span></code> returns one DataFrame — the cluster (or hit) fields plus the
+TDC columns, with <code class="docutils literal notranslate"><span class="pre">tdc_type</span></code> decoded to its name and <code class="docutils literal notranslate"><span class="pre">tdc_dt_s</span></code> added in
+seconds:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="nb">id</span>  <span class="n">size</span>        <span class="n">ctoa</span>  <span class="n">sum_tot</span>  <span class="n">ctot</span>   <span class="n">cx</span>   <span class="n">cy</span>         <span class="n">tdc</span>  <span class="n">tdc_dt</span>  <span class="n">tdc_index</span>  <span class="n">tdc_trigger</span>    <span class="n">tdc_type</span>      <span class="n">tdc_dt_s</span>
+<span class="mi">397</span>  <span class="mi">397</span>     <span class="mi">1</span>  <span class="mi">5200125000</span>     <span class="mi">1000</span>  <span class="mi">1000</span>  <span class="mi">147</span>  <span class="mi">238</span>  <span class="mi">5199888020</span>  <span class="mi">236980</span>          <span class="mi">0</span>           <span class="mi">11</span>  <span class="n">TDC1Rising</span>  <span class="mf">2.369800e-08</span>
+<span class="mi">398</span>  <span class="mi">398</span>     <span class="mi">1</span>  <span class="mi">5200218750</span>      <span class="mi">950</span>   <span class="mi">950</span>  <span class="mi">224</span>  <span class="mi">280</span>  <span class="mi">5199888020</span>  <span class="mi">330730</span>          <span class="mi">0</span>           <span class="mi">11</span>  <span class="n">TDC1Rising</span>  <span class="mf">3.307300e-08</span>
+</pre></div>
+</div>
+<p>It uses the stored dataset when one is there and computes the tagging on the
+fly when it is not, so it works on a file straight out of <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>. Passing
+<code class="docutils literal notranslate"><span class="pre">reference=</span></code> forces the on-the-fly path, which is how you look at a different
+edge without rewriting the file.</p>
+</section>
+<section id="reference-edge">
+<h3>Reference edge<a class="headerlink" href="#reference-edge" title="Link to this heading"></a></h3>
+<p>The <strong>TDC reference</strong> setting — the same control on both tabs — picks which
+edge starts the clock, with <code class="docutils literal notranslate"><span class="pre">Any</span> <span class="pre">edge</span></code> tagging from the most recent edge of any
+type. It is independent of <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>’s own <code class="docutils literal notranslate"><span class="pre">--tof-tdc-reference</span></code>: that flag
+makes <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> fill <code class="docutils literal notranslate"><span class="pre">PixelHits/tof</span></code> during processing, whereas these columns
+are computed afterwards and can be recomputed against a different edge whenever
+you like, without reprocessing the <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>.</p>
+<p>Where the two overlap they agree exactly. On the ASI example file, with
+<code class="docutils literal notranslate"><span class="pre">--tof-tdc-reference</span> <span class="pre">TDC1Rising</span></code> passed and <code class="docutils literal notranslate"><span class="pre">TDC1Rising</span></code> chosen here,
+<code class="docutils literal notranslate"><span class="pre">tdc_dt</span> <span class="pre">==</span> <span class="pre">tof</span></code> for all 25 762 tagged hits, and both mark the same 667 rows
+unset.</p>
+</section>
+<section id="plot-styling">
+<h3>Plot styling<a class="headerlink" href="#plot-styling" title="Link to this heading"></a></h3>
+<p>The plots follow the app theme using two style sheets from
+<a class="reference external" href="https://github.com/rngKomorebi/komorebi_mpl">komorebi_mpl</a>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>App theme</p></th>
+<th class="head"><p>Style</p></th>
+<th class="head"><p>Colormap</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Dark</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">night_wave</span></code></p></td>
+<td><p>plasma</p></td>
+</tr>
+<tr class="row-odd"><td><p>Light</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sci_pure</span></code></p></td>
+<td><p>cividis</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">komorebi_mpl</span></code> (it is in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>). It is optional — if it
+is not installed the plots colour themselves from the app palette exactly as
+before, so nothing breaks.</p>
+</section>
+</section>
+<section id="installing-from-source">
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Link to this heading"></a></h2>
+<p>A fresh virtual environment is recommended:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/rngKomorebi/Luna-Tpx3-GUI
+<span class="nb">cd</span><span class="w"> </span>Luna-Tpx3-GUI
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="c1"># Windows:  .venv\Scripts\activate</span>
+<span class="c1"># Linux:    source .venv/bin/activate</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[analysis]"</span>
+</pre></div>
+</div>
+<p>Then any of these starts the GUI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>luna-tpx3-gui<span class="w">                </span><span class="c1"># console script installed by pip</span>
+python<span class="w"> </span>-m<span class="w"> </span>luna_tpx3_gui
+python<span class="w"> </span>src/main.py<span class="w">           </span><span class="c1"># works without installing, given the dependencies</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> without the <code class="docutils literal notranslate"><span class="pre">[analysis]</span></code> extra installs PySide6 only —
+enough to build and run batches, but the Inspect tab stays inert. <code class="docutils literal notranslate"><span class="pre">run_gui.bat</span></code>
+and <code class="docutils literal notranslate"><span class="pre">run_gui.sh</span></code> pick up a <code class="docutils literal notranslate"><span class="pre">.venv</span></code> beside them automatically.</p>
+</section>
+<section id="project-layout">
+<h2>Project layout<a class="headerlink" href="#project-layout" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span><span class="o">/</span>
+  <span class="n">main</span><span class="o">.</span><span class="n">py</span>                 <span class="n">direct</span><span class="o">-</span><span class="n">run</span> <span class="n">entry</span> <span class="n">point</span><span class="p">;</span> <span class="n">what</span> <span class="n">the</span> <span class="n">launchers</span> <span class="n">start</span>
+  <span class="n">luna_tpx3_gui</span><span class="o">/</span>
+    <span class="n">functions</span><span class="o">/</span>            <span class="n">Qt</span><span class="o">-</span><span class="n">free</span> <span class="n">core</span> <span class="o">--</span> <span class="n">importable</span> <span class="n">without</span> <span class="n">PySide6</span>
+      <span class="n">backend</span><span class="o">.</span><span class="n">py</span>            <span class="n">native</span> <span class="o">/</span> <span class="n">WSL</span> <span class="n">detection</span><span class="p">,</span> <span class="n">path</span> <span class="n">translation</span><span class="p">,</span> <span class="n">drive</span> <span class="n">mounts</span>
+      <span class="n">naming</span><span class="o">.</span><span class="n">py</span>             <span class="n">metadata</span> <span class="o">-&gt;</span> <span class="n">name</span> <span class="n">templates</span><span class="p">,</span> <span class="n">the</span> <span class="n">Job</span> <span class="n">record</span>
+      <span class="n">tdc</span><span class="o">.</span><span class="n">py</span>                <span class="o">/</span><span class="n">TDCEvents</span> <span class="n">dedup</span><span class="p">,</span> <span class="n">TDC</span> <span class="n">columns</span><span class="p">,</span> <span class="n">read_with_tdc</span><span class="p">()</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">py</span>             <span class="o">~/.</span><span class="n">luna_tpx3_gui_qt</span><span class="o">.</span><span class="n">json</span>
+      <span class="n">plotting</span><span class="o">.</span><span class="n">py</span>           <span class="n">plot</span> <span class="n">constants</span><span class="p">,</span> <span class="n">komorebi_mpl</span> <span class="n">styling</span>
+      <span class="n">common</span><span class="o">.</span><span class="n">py</span>             <span class="n">app</span> <span class="n">identity</span><span class="p">,</span> <span class="n">icon</span> <span class="n">path</span>
+    <span class="n">gui</span><span class="o">/</span>                  <span class="n">the</span> <span class="n">Qt</span> <span class="n">application</span>
+      <span class="n">main_window</span><span class="o">.</span><span class="n">py</span>        <span class="n">Process</span><span class="p">,</span> <span class="n">Advanced</span> <span class="ow">and</span> <span class="n">Inspect</span> <span class="n">HDF5</span> <span class="n">tabs</span>
+      <span class="n">models</span><span class="o">.</span><span class="n">py</span><span class="p">,</span> <span class="n">widgets</span><span class="o">.</span><span class="n">py</span><span class="p">,</span> <span class="n">style</span><span class="o">.</span><span class="n">py</span>
+    <span class="n">icon</span><span class="o">/</span>                 <span class="n">app</span> <span class="n">icon</span>
+<span class="n">tests</span><span class="o">/</span>                    <span class="n">pytest</span> <span class="n">suite</span> <span class="k">for</span> <span class="n">the</span> <span class="n">Qt</span><span class="o">-</span><span class="n">free</span> <span class="n">core</span>
+<span class="n">docs</span><span class="o">/</span>                     <span class="n">screenshots</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">Sphinx</span> <span class="n">site</span> <span class="n">built</span> <span class="n">by</span> <span class="n">CI</span>
+</pre></div>
+</div>
+</section>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">~/.luna_tpx3_gui_qt.json</span></code> — Luna path, folder list, template, flags, TDC
+reference, theme.
+On Windows that is <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;you&gt;\.luna_tpx3_gui_qt.json</span></code>.</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Symptom</p></th>
+<th class="head"><p>Cause and fix</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Status reads <code class="docutils literal notranslate"><span class="pre">none</span></code>, “no WSL distribution installed”</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wsl</span> <span class="pre">--install</span> <span class="pre">-d</span> <span class="pre">Ubuntu</span></code>, then press <strong>Check install</strong> — no restart needed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> not found under the Luna folder</p></td>
+<td><p>Point at the install root or its <code class="docutils literal notranslate"><span class="pre">bin/</span></code>, not at the <code class="docutils literal notranslate"><span class="pre">.zip</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>UNC path rejected</p></td>
+<td><p>Map <code class="docutils literal notranslate"><span class="pre">\\server\share</span></code> to a drive letter first.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Qt plugin <code class="docutils literal notranslate"><span class="pre">xcb</span></code> will not load (Linux)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libxcb-cursor0</span> <span class="pre">libxkbcommon-x11-0</span> <span class="pre">libegl1</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Launcher installed but not in the applications menu (Linux)</p></td>
+<td><p>Work through <strong>Linux step 4</strong> — start with <code class="docutils literal notranslate"><span class="pre">desktop-file-validate</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Generic gear instead of the app icon in the dock (Linux)</p></td>
+<td><p>The window must be matched to its <code class="docutils literal notranslate"><span class="pre">.desktop</span></code> entry. Install the launcher with <code class="docutils literal notranslate"><span class="pre">./install-linux.sh</span></code> — the app reports itself as <code class="docutils literal notranslate"><span class="pre">luna-tpx3-gui-qt</span></code>, and without that file there is nothing to match.</p></td>
+</tr>
+<tr class="row-even"><td><p>Menu entry appears but clicking it does nothing (Linux)</p></td>
+<td><p>PySide6 or <code class="docutils literal notranslate"><span class="pre">libxcb-cursor0</span></code> missing. Run <code class="docutils literal notranslate"><span class="pre">./run_gui.sh</span></code> in a terminal to see the real error.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inspect tab inert</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">h5py</span> <span class="pre">numpy</span> <span class="pre">pandas</span> <span class="pre">matplotlib</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>“No <code class="docutils literal notranslate"><span class="pre">/TDCEvents</span></code> in this file”</p></td>
+<td><p>The file predates <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code>’s TDC support, or the run recorded no TDC at all. Reprocess the <code class="docutils literal notranslate"><span class="pre">.tpx3</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“No TDC1Rising edges in this file”</p></td>
+<td><p>That reference was never pulsed — the summary line lists which types the file does have.</p></td>
+</tr>
+<tr class="row-even"><td><p>Most rows report no TDC</p></td>
+<td><p>They precede the first reference edge. Normal at the start of a run; the plot title and the write dialog both state how many.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/ClustersTDC</span></code> already exists, refusing to replace</p></td>
+<td><p>Something other than this GUI wrote that name. Rename or remove it yourself — the GUI will not overwrite what it did not write.</p></td>
+</tr>
+<tr class="row-even"><td><p>Window opens taller than the screen</p></td>
+<td><p>Fixed — the window now clamps itself to the work area on first show.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Batch is slow on Windows</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/mnt/d</span></code> goes through WSL’s 9P bridge; copy raw data into the WSL filesystem for big jobs.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">index</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">bounds:</span> <span class="pre">the</span> <span class="pre">len</span> <span class="pre">is</span> <span class="pre">0</span></code>, after <code class="docutils literal notranslate"><span class="pre">Skipping</span> <span class="pre">file</span> <span class="pre">...</span></code></p></td>
+<td><p>WSL cannot see the drive the data is on – normal for USB sticks and other removable disks. Answer <strong>Yes</strong> when the GUI offers to mount it, or see <em>Can WSL see your data?</em> above.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Files report <code class="docutils literal notranslate"><span class="pre">skipped</span> <span class="pre">-</span> <span class="pre">output</span> <span class="pre">exists</span></code></p></td>
+<td><p>That is the <strong>Skip files whose output already exists</strong> option. Tick <strong>Overwrite</strong> on the rows you want redone, or use the checkbox in that column’s header to tick them all.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="licence-note">
+<h2>Licence note<a class="headerlink" href="#licence-note" title="Link to this heading"></a></h2>
+<p>This program is a wrapper only. It does not contain, modify, decompile or
+redistribute any part of Luna. It runs the unmodified <code class="docutils literal notranslate"><span class="pre">tpx3dump</span></code> executable as
+a subprocess through its documented command line interface, and you point it
+at your own Luna installation.</p>
+<p>For the same reason there is <strong>no bundled executable</strong> — no PyInstaller
+<code class="docutils literal notranslate"><span class="pre">.exe</span></code>, no AppImage, no release downloads — on any platform. A self-contained
+bundle makes it too easy to pass the GUI on with the Luna binaries packed
+inside it, which would break Luna’s licence. The GUI runs from source, through
+the launchers and shortcuts described above. <strong>Do not bundle the Luna
+binaries with this GUI if you pass it on.</strong></p>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h2>
+<p>Two branches: <code class="docutils literal notranslate"><span class="pre">main</span></code> (stable) and <code class="docutils literal notranslate"><span class="pre">develop</span></code>
+(active development). Fork, work on a branch off <code class="docutils literal notranslate"><span class="pre">develop</span></code>, and open a pull
+request against it. <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/</span></code> runs the test suite, which needs no
+display. See <a class="reference internal" href="#CONTRIBUTING.md"><span class="xref myst">CONTRIBUTING.md</span></a>.</p>
+</section>
+<section id="license-and-contact">
+<h2>License and contact<a class="headerlink" href="#license-and-contact" title="Link to this heading"></a></h2>
+<p>MIT — see <a class="reference internal" href="#LICENSE"><span class="xref myst">LICENSE</span></a>. This covers the GUI only; ASI Luna is licensed
+separately by its vendor.</p>
+<p>Sergei Kulkov — sergei.kulkov&#64;fjfi.cvut.cz. Bugs and
+feature requests: <a class="reference external" href="https://github.com/rngKomorebi/Luna-Tpx3-GUI/issues">GitHub issues</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Luna Tpx3 GUI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Sergei Kulkov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

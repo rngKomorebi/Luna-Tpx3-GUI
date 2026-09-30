@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>luna_tpx3_gui package &mdash; Luna Tpx3 GUI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="luna_tpx3_gui.functions package" href="luna_tpx3_gui.functions.html" />
+    <link rel="prev" title="luna_tpx3_gui" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Luna Tpx3 GUI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Luna Tpx3 GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#linux">Linux</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#windows">Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API (Qt-free core):</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">luna_tpx3_gui</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">luna_tpx3_gui package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#luna_tpx3_gui.add_tdc_columns"><code class="docutils literal notranslate"><span class="pre">add_tdc_columns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#luna_tpx3_gui.read_tdcs"><code class="docutils literal notranslate"><span class="pre">read_tdcs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#luna_tpx3_gui.read_with_tdc"><code class="docutils literal notranslate"><span class="pre">read_with_tdc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.html">luna_tpx3_gui.functions package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Luna Tpx3 GUI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">luna_tpx3_gui</a></li>
+      <li class="breadcrumb-item active">luna_tpx3_gui package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/luna_tpx3_gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-luna_tpx3_gui">
+<span id="luna-tpx3-gui-package"></span><h1>luna_tpx3_gui package<a class="headerlink" href="#module-luna_tpx3_gui" title="Link to this heading"></a></h1>
+<p>Luna Tpx3 GUI – Qt 6 (PySide6) front end for ASI Luna’s tpx3dump.</p>
+<p>Browse to the data, let the GUI work out the names, and run the whole batch,
+instead of typing tpx3dump process -i … -o … once per file.</p>
+<p>This program does not contain, modify, decompile or redistribute any part of
+Luna. It runs the <em>unmodified</em> tpx3dump executable as a subprocess through its
+documented command line interface.</p>
+<p>The TDC helpers are Qt-free and importable on their own, e.g. from a notebook:</p>
+<blockquote>
+<div><p>import luna_tpx3_gui as g
+g.read_tdcs(“run.hdf5”)                     # the edges, deduplicated
+g.add_tdc_columns(“run.hdf5”, “TDC1Rising”)  # write the columns
+df = g.read_with_tdc(“run.hdf5”, “Clusters”) # frame with the TDC columns</p>
+</div></blockquote>
+<p>Importing the package does not import PySide6; only the GUI modules do.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="luna_tpx3_gui.add_tdc_columns">
+<span class="sig-prename descclassname"><span class="pre">luna_tpx3_gui.</span></span><span class="sig-name descname"><span class="pre">add_tdc_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TDC1Rising'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/luna_tpx3_gui/functions/tdc.html#add_tdc_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#luna_tpx3_gui.add_tdc_columns" title="Link to this definition"></a></dt>
+<dd><p>Write row-aligned TDC columns into an existing tpx3dump HDF5.</p>
+<p>Adds /PixelHitsTDC and /ClustersTDC beside the datasets they describe, each
+row i carrying the trigger that row i of the source belongs to. The
+originals are never rewritten: an HDF5 compound dataset has a fixed dtype,
+so a genuine extra field would mean recreating the whole thing, and these
+files are the only copy of the measurement. Readers join the two, which
+read_with_tdc() below does.</p>
+<p>Returns {dataset name: summary dict}, and raises on anything wrong.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="luna_tpx3_gui.read_tdcs">
+<span class="sig-prename descclassname"><span class="pre">luna_tpx3_gui.</span></span><span class="sig-name descname"><span class="pre">read_tdcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/luna_tpx3_gui/functions/tdc.html#read_tdcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#luna_tpx3_gui.read_tdcs" title="Link to this definition"></a></dt>
+<dd><p>The deduplicated TDC edges as a DataFrame, with decoded type and seconds.</p>
+<p>The direct equivalent of ASI’s read_tdcs.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="luna_tpx3_gui.read_with_tdc">
+<span class="sig-prename descclassname"><span class="pre">luna_tpx3_gui.</span></span><span class="sig-name descname"><span class="pre">read_with_tdc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Clusters'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/luna_tpx3_gui/functions/tdc.html#read_with_tdc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#luna_tpx3_gui.read_with_tdc" title="Link to this definition"></a></dt>
+<dd><p>One DataFrame of <cite>which</cite> with the TDC columns joined onto it.</p>
+<p>Uses the stored /…TDC dataset when add_tdc_columns() has written one;
+otherwise tags on the fly from /TDCEvents, so this also works on a file
+straight out of tpx3dump. Passing <cite>reference</cite> forces the on-the-fly path,
+which is how you look at a different edge without rewriting the file.
+<cite>tdc_type</cite> comes back as the readable name and <cite>tdc_dt_s</cite> as seconds, both
+derived here rather than stored.</p>
+</dd></dl>
+
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="luna_tpx3_gui.functions.html">luna_tpx3_gui.functions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="luna_tpx3_gui.functions.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html">luna_tpx3_gui.functions.backend module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.detect_backend"><code class="docutils literal notranslate"><span class="pre">detect_backend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.drive_letter"><code class="docutils literal notranslate"><span class="pre">drive_letter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.win_to_wsl"><code class="docutils literal notranslate"><span class="pre">win_to_wsl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.wsl_distros"><code class="docutils literal notranslate"><span class="pre">wsl_distros()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.wsl_missing_paths"><code class="docutils literal notranslate"><span class="pre">wsl_missing_paths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.wsl_mount_drive"><code class="docutils literal notranslate"><span class="pre">wsl_mount_drive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.backend.html#luna_tpx3_gui.functions.backend.wsl_unmounted_drives"><code class="docutils literal notranslate"><span class="pre">wsl_unmounted_drives()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.common.html">luna_tpx3_gui.functions.common module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.common.html#luna_tpx3_gui.functions.common.human_size"><code class="docutils literal notranslate"><span class="pre">human_size()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.config.html">luna_tpx3_gui.functions.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.config.html#luna_tpx3_gui.functions.config.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.config.html#luna_tpx3_gui.functions.config.save_config"><code class="docutils literal notranslate"><span class="pre">save_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html">luna_tpx3_gui.functions.naming module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html#luna_tpx3_gui.functions.naming.Job"><code class="docutils literal notranslate"><span class="pre">Job</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html#luna_tpx3_gui.functions.naming.measurement_context"><code class="docutils literal notranslate"><span class="pre">measurement_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html#luna_tpx3_gui.functions.naming.migrate_template"><code class="docutils literal notranslate"><span class="pre">migrate_template()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html#luna_tpx3_gui.functions.naming.render_name"><code class="docutils literal notranslate"><span class="pre">render_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.naming.html#luna_tpx3_gui.functions.naming.sanitize"><code class="docutils literal notranslate"><span class="pre">sanitize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.plotting.html">luna_tpx3_gui.functions.plotting module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.plotting.html#luna_tpx3_gui.functions.plotting.onscreen_overrides"><code class="docutils literal notranslate"><span class="pre">onscreen_overrides()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.plotting.html#luna_tpx3_gui.functions.plotting.plot_style_context"><code class="docutils literal notranslate"><span class="pre">plot_style_context()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html">luna_tpx3_gui.functions.tdc module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.add_tdc_columns"><code class="docutils literal notranslate"><span class="pre">add_tdc_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.describe_tdc_types"><code class="docutils literal notranslate"><span class="pre">describe_tdc_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.read_tdc_events"><code class="docutils literal notranslate"><span class="pre">read_tdc_events()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.read_tdcs"><code class="docutils literal notranslate"><span class="pre">read_tdcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.read_with_tdc"><code class="docutils literal notranslate"><span class="pre">read_with_tdc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.tag_times_with_tdc"><code class="docutils literal notranslate"><span class="pre">tag_times_with_tdc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.functions.tdc.tdc_reference_edges"><code class="docutils literal notranslate"><span class="pre">tdc_reference_edges()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="luna_tpx3_gui" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="luna_tpx3_gui.functions.html" class="btn btn-neutral float-right" title="luna_tpx3_gui.functions package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Sergei Kulkov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

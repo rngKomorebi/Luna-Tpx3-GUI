@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>luna_tpx3_gui.functions.tdc &mdash; Luna Tpx3 GUI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Luna Tpx3 GUI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Luna Tpx3 GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#linux">Linux</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#windows">Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API (Qt-free core):</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">luna_tpx3_gui</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Luna Tpx3 GUI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">luna_tpx3_gui.functions.tdc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for luna_tpx3_gui.functions.tdc</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""TDC post-processing: read /TDCEvents, tag hits and clusters with the edge</span>
+<span class="sd">they follow, and write those columns back into the .hdf5.</span>
+
+<span class="sd">Qt-free. h5py, numpy and pandas are imported inside the functions that need</span>
+<span class="sd">them, so importing this module needs none of them.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="c1"># tpx3dump's --tof-tdc-reference: which TDC edge starts the time-of-flight</span>
+<span class="c1"># clock. Left off, tpx3dump uses its own default reference.</span>
+<span class="n">TOF_TDC_REFERENCES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"TDC1Rising"</span><span class="p">,</span> <span class="s2">"TDC1Falling"</span><span class="p">,</span>
+                      <span class="s2">"TDC2Rising"</span><span class="p">,</span> <span class="s2">"TDC2Falling"</span><span class="p">]</span>
+
+<span class="c1"># --- TDC ------------------------------------------------------------------</span>
+<span class="c1"># tpx3dump writes every TDC edge it saw into /TDCEvents as</span>
+<span class="c1"># (tdc_type u1, trigger_count u2, timestamp u8). The type codes are the same</span>
+<span class="c1"># four references --tof-tdc-reference accepts, numbered from one.</span>
+<span class="n">TDC_DATASET</span> <span class="o">=</span> <span class="s2">"TDCEvents"</span>
+<span class="n">TDC_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">"TDC1Rising"</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">"TDC1Falling"</span><span class="p">,</span>
+             <span class="mi">3</span><span class="p">:</span> <span class="s2">"TDC2Rising"</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">"TDC2Falling"</span><span class="p">}</span>
+<span class="n">TDC_TYPE_CODES</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">code</span> <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">TDC_TYPES</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="c1"># Every timestamp in the file -- TDCEvents/timestamp, PixelHits/toa and</span>
+<span class="c1"># Clusters/ctoa alike -- counts 100 fs ticks off one clock, which is what makes</span>
+<span class="c1"># the hit-to-edge subtraction below meaningful.</span>
+<span class="n">TDC_SECONDS_PER_TICK</span> <span class="o">=</span> <span class="mf">1e-13</span>
+
+<span class="c1"># "tag every row with the last reference edge before it", per source dataset:</span>
+<span class="c1"># which dataset holds the row times, which field they live in, and where the</span>
+<span class="c1"># TDC columns for it are written. The tagged dataset is row-aligned 1:1 with</span>
+<span class="c1"># its source, so a reader concatenates the two into one frame.</span>
+<span class="n">TDC_SOURCES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"PixelHits"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"toa"</span><span class="p">,</span> <span class="s2">"PixelHitsTDC"</span><span class="p">),</span>
+               <span class="s2">"Clusters"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"ctoa"</span><span class="p">,</span> <span class="s2">"ClustersTDC"</span><span class="p">)}</span>
+
+<span class="c1"># The columns themselves. Packed, not aligned: these compress to almost</span>
+<span class="c1"># nothing (tdc and tdc_trigger are constant across a whole trigger's worth of</span>
+<span class="c1"># rows) and the width still matters for a hundred-million-hit file.</span>
+<span class="n">TDC_COLUMN_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"tdc"</span><span class="p">,</span> <span class="s2">"&lt;u8"</span><span class="p">),</span>          <span class="c1"># timestamp of the reference edge, 100 fs ticks</span>
+    <span class="p">(</span><span class="s2">"tdc_dt"</span><span class="p">,</span> <span class="s2">"&lt;i8"</span><span class="p">),</span>       <span class="c1"># row time minus that edge, same ticks</span>
+    <span class="p">(</span><span class="s2">"tdc_index"</span><span class="p">,</span> <span class="s2">"&lt;i4"</span><span class="p">),</span>    <span class="c1"># row in the deduped TDC table, -1 = none</span>
+    <span class="p">(</span><span class="s2">"tdc_trigger"</span><span class="p">,</span> <span class="s2">"&lt;u2"</span><span class="p">),</span>  <span class="c1"># tpx3dump's trigger_count for that edge</span>
+    <span class="p">(</span><span class="s2">"tdc_type"</span><span class="p">,</span> <span class="s2">"u1"</span><span class="p">),</span>      <span class="c1"># 1..4 per TDC_TYPES, 0 = no edge yet</span>
+<span class="p">]</span>
+<span class="n">TDC_COLUMN_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">TDC_COLUMN_FIELDS</span><span class="p">]</span>
+
+<span class="c1"># Rows that precede the first reference edge have no edge to measure from.</span>
+<span class="c1"># tpx3dump signals the same thing in PixelHits/tof with -1, so match it rather</span>
+<span class="c1"># than invent a second convention.</span>
+<span class="n">TDC_UNSET</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="c1"># Marks a dataset this GUI wrote, so re-tagging a file replaces its own</span>
+<span class="c1"># previous columns and refuses to touch anything else.</span>
+<span class="n">TDC_STAMP</span> <span class="o">=</span> <span class="s2">"luna_tpx3_gui.tdc_columns"</span>
+
+<span class="c1"># "Any edge" tags each row from the most recent edge of whatever type, instead</span>
+<span class="c1"># of following one reference. Useful when TDC1 and TDC2 both carry triggers.</span>
+<span class="n">TDC_REFERENCE_ANY</span> <span class="o">=</span> <span class="s2">"Any edge"</span>
+<span class="n">TDC_REFERENCES</span> <span class="o">=</span> <span class="n">TOF_TDC_REFERENCES</span> <span class="o">+</span> <span class="p">[</span><span class="n">TDC_REFERENCE_ANY</span><span class="p">]</span>
+
+<span class="c1"># Rows read per slice when tagging. 2e6 hits is ~32 MB of toa, so a file far</span>
+<span class="c1"># larger than memory still tags in bounded space.</span>
+<span class="n">TDC_CHUNK</span> <span class="o">=</span> <span class="mi">2_000_000</span>
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># TDC: read /TDCEvents, and tag hits and clusters with the edge they follow</span>
+<span class="c1">#</span>
+<span class="c1"># Nothing below touches Qt, so the same functions work from a notebook:</span>
+<span class="c1">#</span>
+<span class="c1">#     import luna_tpx3_gui as g</span>
+<span class="c1">#     df = g.read_tdcs("run.hdf5")                 # the edges themselves</span>
+<span class="c1">#     g.add_tdc_columns("run.hdf5", "TDC1Rising")  # write the columns</span>
+<span class="c1">#     df = g.read_with_tdc("run.hdf5", "Clusters") # frame with a tdc column</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="read_tdc_events">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.read_tdc_events">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_tdc_events</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Physical TDC edges from an open HDF5 file, sorted by timestamp.</span>
+
+<span class="sd">    Every chip in the layout repeats the TDC packet, so a quad carries each</span>
+<span class="sd">    edge four times and an octal eight. Deduplicating on (tdc_type, timestamp)</span>
+<span class="sd">    collapses those back to the edges that actually happened -- the same thing</span>
+<span class="sd">    ASI's read_tdcs.py does, and the reason a 40-row /TDCEvents in a quad file</span>
+<span class="sd">    describes only ten triggers.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">TDC_DATASET</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">TDC_DATASET</span><span class="p">][:]</span>
+    <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">raw</span>
+    <span class="c1"># Sort by timestamp with tdc_type as the tiebreak, which puts every repeat</span>
+    <span class="c1"># of one edge next to its twin so a neighbour test is enough to drop them.</span>
+    <span class="n">ev</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">raw</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">],</span> <span class="n">raw</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]))]</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ev</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">keep</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">((</span><span class="n">ev</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">ev</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">|</span>
+                <span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">ev</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">ev</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="tdc_reference_edges">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.tdc_reference_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tdc_reference_edges</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The edges that act as the clock: one type, or all of them."""</span>
+    <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">events</span>
+    <span class="k">if</span> <span class="n">reference</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">TDC_REFERENCE_ANY</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">events</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">TDC_TYPE_CODES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Unknown TDC reference: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">reference</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">events</span><span class="p">[</span><span class="n">events</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">]</span> <span class="o">==</span> <span class="n">code</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="describe_tdc_types">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.describe_tdc_types">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">describe_tdc_types</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""'20 TDC1Rising, 20 TDC1Falling' -- for error messages and the summary."""</span>
+    <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"no edges"</span>
+    <span class="n">codes</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="s2">","</span><span class="p">),</span>
+                                <span class="n">TDC_TYPES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="s2">"type </span><span class="si">%d</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span>
+                     <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">counts</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="tag_times_with_tdc">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.tag_times_with_tdc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tag_times_with_tdc</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""TDC columns for one block of row times.</span>
+
+<span class="sd">    Each row is attributed to the last reference edge at or before it -- the</span>
+<span class="sd">    trigger it belongs to. Rows arriving before the first edge get TDC_UNSET,</span>
+<span class="sd">    matching how tpx3dump leaves PixelHits/tof at -1 when it has no reference</span>
+<span class="sd">    to measure from.</span>
+<span class="sd">    """</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">TDC_COLUMN_FIELDS</span><span class="p">))</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_index"</span><span class="p">]</span> <span class="o">=</span> <span class="n">TDC_UNSET</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_dt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">TDC_UNSET</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">edges</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="n">stamps</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span>
+    <span class="c1"># side="right" so a hit landing exactly on an edge belongs to that edge</span>
+    <span class="c1"># rather than to the one before it.</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">stamps</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">has</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">has</span><span class="p">]</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_index"</span><span class="p">][</span><span class="n">has</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc"</span><span class="p">][</span><span class="n">has</span><span class="p">]</span> <span class="o">=</span> <span class="n">stamps</span><span class="p">[</span><span class="n">sel</span><span class="p">]</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">][</span><span class="n">has</span><span class="p">]</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">][</span><span class="n">sel</span><span class="p">]</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_trigger"</span><span class="p">][</span><span class="n">has</span><span class="p">]</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="s2">"trigger_count"</span><span class="p">][</span><span class="n">sel</span><span class="p">]</span>
+    <span class="c1"># int64 on purpose: times is unsigned, so an unsigned difference would wrap</span>
+    <span class="c1"># to something enormous instead of going negative.</span>
+    <span class="n">out</span><span class="p">[</span><span class="s2">"tdc_dt"</span><span class="p">][</span><span class="n">has</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">has</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"int64"</span><span class="p">)</span> <span class="o">-</span>
+                          <span class="n">stamps</span><span class="p">[</span><span class="n">sel</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"int64"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="add_tdc_columns">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.add_tdc_columns">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_tdc_columns</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s2">"TDC1Rising"</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Write row-aligned TDC columns into an existing tpx3dump HDF5.</span>
+
+<span class="sd">    Adds /PixelHitsTDC and /ClustersTDC beside the datasets they describe, each</span>
+<span class="sd">    row i carrying the trigger that row i of the source belongs to. The</span>
+<span class="sd">    originals are never rewritten: an HDF5 compound dataset has a fixed dtype,</span>
+<span class="sd">    so a genuine extra field would mean recreating the whole thing, and these</span>
+<span class="sd">    files are the only copy of the measurement. Readers join the two, which</span>
+<span class="sd">    read_with_tdc() below does.</span>
+
+<span class="sd">    Returns {dataset name: summary dict}, and raises on anything wrong.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">say</span> <span class="o">=</span> <span class="n">log</span> <span class="k">if</span> <span class="n">log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_m</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r+"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">read_tdc_events</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"No /</span><span class="si">%s</span><span class="s2"> in this file. It came from a tpx3dump older than the "</span>
+                <span class="s2">"TDC support, or the acquisition recorded no TDC at all."</span>
+                <span class="o">%</span> <span class="n">TDC_DATASET</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"/</span><span class="si">%s</span><span class="s2"> is empty: this run saw no TDC edges, so there "</span>
+                             <span class="s2">"is nothing to tag rows with."</span> <span class="o">%</span> <span class="n">TDC_DATASET</span><span class="p">)</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">tdc_reference_edges</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No </span><span class="si">%s</span><span class="s2"> edges in this file. It has </span><span class="si">%s</span><span class="s2">."</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">describe_tdc_types</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">np</span><span class="p">)))</span>
+        <span class="n">say</span><span class="p">(</span><span class="s2">"  </span><span class="si">%d</span><span class="s2"> TDC edge(s) after dedup, </span><span class="si">%d</span><span class="s2"> of them </span><span class="si">%s</span><span class="s2">"</span>
+            <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">reference</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">src_name</span><span class="p">,</span> <span class="p">(</span><span class="n">time_field</span><span class="p">,</span> <span class="n">out_name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">TDC_SOURCES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">src_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">src_name</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">out_name</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="c1"># Only ever replace columns this GUI wrote. Anything else</span>
+                <span class="c1"># under that name belongs to the user or to another tool.</span>
+                <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="n">out_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"written_by"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TDC_STAMP</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">"/</span><span class="si">%s</span><span class="s2"> already exists and was not written by this GUI. "</span>
+                        <span class="s2">"Refusing to replace it."</span> <span class="o">%</span> <span class="n">out_name</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="n">out_name</span><span class="p">]</span>
+            <span class="n">dset</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                <span class="n">out_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">TDC_COLUMN_FIELDS</span><span class="p">),</span>
+                <span class="c1"># One chunk per tagging slice would be far too big to cache;</span>
+                <span class="c1"># 64k rows is ~1.4 MB, which gzip likes and readers can stream.</span>
+                <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">65536</span><span class="p">),),</span> <span class="n">compression</span><span class="o">=</span><span class="s2">"gzip"</span><span class="p">,</span> <span class="n">compression_opts</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">tagged</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">TDC_CHUNK</span><span class="p">):</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">TDC_CHUNK</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="n">tag_times_with_tdc</span><span class="p">(</span><span class="n">src</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">][</span><span class="n">time_field</span><span class="p">],</span> <span class="n">edges</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+                <span class="n">dset</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cols</span>
+                <span class="n">tagged</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">((</span><span class="n">cols</span><span class="p">[</span><span class="s2">"tdc_index"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"written_by"</span><span class="p">]</span> <span class="o">=</span> <span class="n">TDC_STAMP</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"source_dataset"</span><span class="p">]</span> <span class="o">=</span> <span class="n">src_name</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"source_time_field"</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_field</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"tdc_reference"</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"seconds_per_tick"</span><span class="p">]</span> <span class="o">=</span> <span class="n">TDC_SECONDS_PER_TICK</span>
+            <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"n_reference_edges"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">out_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"rows"</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span> <span class="s2">"tagged"</span><span class="p">:</span> <span class="n">tagged</span><span class="p">,</span>
+                                <span class="s2">"source"</span><span class="p">:</span> <span class="n">src_name</span><span class="p">,</span> <span class="s2">"reference"</span><span class="p">:</span> <span class="n">reference</span><span class="p">}</span>
+            <span class="n">say</span><span class="p">(</span><span class="s2">"  /</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> of </span><span class="si">%s</span><span class="s2"> row(s) fall after a </span><span class="si">%s</span><span class="s2"> edge"</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">out_name</span><span class="p">,</span> <span class="nb">format</span><span class="p">(</span><span class="n">tagged</span><span class="p">,</span> <span class="s2">","</span><span class="p">),</span> <span class="nb">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">","</span><span class="p">),</span> <span class="n">reference</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"This file has neither PixelHits nor Clusters to tag "</span>
+                         <span class="s2">"(processed with --raw-only?)."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="read_tdcs">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.read_tdcs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_tdcs</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The deduplicated TDC edges as a DataFrame, with decoded type and seconds.</span>
+
+<span class="sd">    The direct equivalent of ASI's read_tdcs.py.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">read_tdc_events</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No /</span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">TDC_DATASET</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">TDC_TYPES</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"time_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span> <span class="o">*</span> <span class="n">TDC_SECONDS_PER_TICK</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_with_tdc">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.tdc.html#luna_tpx3_gui.read_with_tdc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_with_tdc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">"Clusters"</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One DataFrame of `which` with the TDC columns joined onto it.</span>
+
+<span class="sd">    Uses the stored /...TDC dataset when add_tdc_columns() has written one;</span>
+<span class="sd">    otherwise tags on the fly from /TDCEvents, so this also works on a file</span>
+<span class="sd">    straight out of tpx3dump. Passing `reference` forces the on-the-fly path,</span>
+<span class="sd">    which is how you look at a different edge without rewriting the file.</span>
+<span class="sd">    `tdc_type` comes back as the readable name and `tdc_dt_s` as seconds, both</span>
+<span class="sd">    derived here rather than stored.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+    <span class="k">if</span> <span class="n">which</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TDC_SOURCES</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected one of </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%r</span><span class="s2">"</span>
+                         <span class="o">%</span> <span class="p">(</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TDC_SOURCES</span><span class="p">),</span> <span class="n">which</span><span class="p">))</span>
+    <span class="n">time_field</span><span class="p">,</span> <span class="n">out_name</span> <span class="o">=</span> <span class="n">TDC_SOURCES</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">which</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">or</span> <span class="n">f</span><span class="p">[</span><span class="n">which</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"This file has no /</span><span class="si">%s</span><span class="s2"> rows."</span> <span class="o">%</span> <span class="n">which</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">which</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">total</span> <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">limit</span><span class="p">),</span> <span class="n">total</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">which</span><span class="p">][:</span><span class="n">n</span><span class="p">])</span>
+        <span class="n">stored</span> <span class="o">=</span> <span class="n">out_name</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">and</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">stored</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">out_name</span><span class="p">][:</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">used</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">out_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tdc_reference"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">events</span> <span class="o">=</span> <span class="n">read_tdc_events</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No usable /</span><span class="si">%s</span><span class="s2"> in this file."</span> <span class="o">%</span> <span class="n">TDC_DATASET</span><span class="p">)</span>
+            <span class="n">used</span> <span class="o">=</span> <span class="n">reference</span> <span class="ow">or</span> <span class="n">TDC_REFERENCE_ANY</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">tag_times_with_tdc</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">which</span><span class="p">][:</span><span class="n">n</span><span class="p">][</span><span class="n">time_field</span><span class="p">],</span>
+                                      <span class="n">tdc_reference_edges</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">used</span><span class="p">,</span> <span class="n">np</span><span class="p">),</span> <span class="n">np</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">TDC_COLUMN_NAMES</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_type"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">TDC_TYPES</span><span class="p">)</span>
+    <span class="c1"># Keep the sentinel visible as NaN rather than a misleading -1e-13 s.</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_dt_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"tdc_index"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
+                              <span class="n">df</span><span class="p">[</span><span class="s2">"tdc_dt"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)</span> <span class="o">*</span>
+                              <span class="n">TDC_SECONDS_PER_TICK</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"tdc_reference"</span><span class="p">]</span> <span class="o">=</span> <span class="n">used</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"tdc_from_file"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">stored</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Sergei Kulkov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

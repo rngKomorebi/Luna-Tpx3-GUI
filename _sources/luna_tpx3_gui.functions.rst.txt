@@ -1,0 +1,20 @@
+luna\_tpx3\_gui.functions package
+=================================
+
+.. automodule:: luna_tpx3_gui.functions
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   luna_tpx3_gui.functions.backend
+   luna_tpx3_gui.functions.common
+   luna_tpx3_gui.functions.config
+   luna_tpx3_gui.functions.naming
+   luna_tpx3_gui.functions.plotting
+   luna_tpx3_gui.functions.tdc
