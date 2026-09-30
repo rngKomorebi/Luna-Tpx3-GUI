@@ -1,0 +1,9 @@
+# Everything the app can use, for a full install from source (install-linux.sh
+# builds its venv from this file). Only PySide6 is strictly required -- the rest enables
+# the Inspect tab, the TDC columns and the plots (see pyproject.toml extras).
+PySide6>=6.5
+h5py
+numpy
+pandas             # TDC columns: the joined hits/clusters frame
+matplotlib
+komorebi_mpl       # plot styles: night_wave (dark) / sci_pure (light)

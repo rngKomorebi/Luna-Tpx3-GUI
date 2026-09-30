@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "luna-tpx3-gui"
+dynamic = ["version"]
+description = "Browse-and-batch Qt front end for ASI Luna's tpx3dump (Timepix3 .tpx3 -> HDF5)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Sergei Kulkov", email = "sergei.kulkov@fjfi.cvut.cz"},
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = ["timepix3", "tpx3", "tpx3dump", "luna", "hdf5", "detector", "qt"]
+# Only PySide6 is needed to start the GUI and run batches.
+dependencies = [
+    "PySide6>=6.5",
+]
+
+[project.optional-dependencies]
+# The Inspect HDF5 tab, the TDC columns and the six plots.
+analysis = [
+    "h5py",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "komorebi_mpl",
+]
+dev = [
+    "pytest",
+    "ruff",
+    "pre-commit",
+]
+
+# Console script -- lets users launch with `luna-tpx3-gui` after `pip install .`
+# A console (not gui) script on purpose: a startup error stays readable.
+[project.scripts]
+luna-tpx3-gui = "luna_tpx3_gui.main:main"
+
+[project.urls]
+Homepage = "https://github.com/rngKomorebi/Luna-Tpx3-GUI"
+Repository = "https://github.com/rngKomorebi/Luna-Tpx3-GUI"
+Issues = "https://github.com/rngKomorebi/Luna-Tpx3-GUI/issues"
+Changelog = "https://github.com/rngKomorebi/Luna-Tpx3-GUI/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "luna_tpx3_gui.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"luna_tpx3_gui" = ["icon/*.png", "icon/*.ico"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+# The code aligns continuation lines and trailing comments by hand; E501 is
+# left to review rather than enforced line by line.
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

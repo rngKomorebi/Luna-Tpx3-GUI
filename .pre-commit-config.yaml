@@ -1,0 +1,20 @@
+# Run `pre-commit autoupdate` periodically to keep hook versions current.
+# Install hooks: pre-commit install
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-toml
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: debug-statements
+
+# Lint only. No ruff-format hook: the code aligns continuation lines and
+# comments by hand, and a formatter would undo that on every commit.
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.0
+    hooks:
+      - id: ruff
+        args: [--fix]

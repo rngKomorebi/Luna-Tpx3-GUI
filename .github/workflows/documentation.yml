@@ -1,0 +1,38 @@
+name: Docs
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install sphinx sphinx_rtd_theme myst-parser
+          pip install -e ".[analysis]"
+
+      # API pages for the Qt-free core only: autodoc imports what it documents,
+      # and the Qt modules would need a display stack on the runner.
+      - name: Build docs
+        run: |
+          sphinx-apidoc -f -e -M -o docs src/luna_tpx3_gui/ src/luna_tpx3_gui/gui src/luna_tpx3_gui/main.py src/luna_tpx3_gui/__main__.py
+          sphinx-build docs _build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/
+          force_orphan: true

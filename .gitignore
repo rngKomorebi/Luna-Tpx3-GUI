@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Bundled executables: this project deliberately ships none (see the licence
+# note in the README), so keep any local experiment out of the repository.
+*.spec
+*.exe
+
+# Testing & coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
+# Type checkers / linters
+.mypy_cache/
+.ruff_cache/
+
+# Sphinx docs build, and the API pages sphinx-apidoc generates in CI
+_build/
+docs/luna_tpx3_gui*.rst
+docs/modules.rst
+
+# Jupyter
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# Claude Code
+.claude/
+
+# IDEs
+.idea/
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Backups / scratch
+_old/
+*_old/
+* - Copy.*
+*.bak
+*.orig
+
+# Local-only material, not part of the published app:
+# design mockups, and button PNGs left over from the retired tkinter build.
+dark design/
+light design/
+assets/
+
+# Never commit Luna itself (licence) or measurement data.
+luna-tpx3-*/
+*.tpx3
+*.hdf5
+*.h5
+run_tpx3dump.sh

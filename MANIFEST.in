@@ -1,0 +1,4 @@
+# Non-Python files for the source distribution.
+include LICENSE README.md CHANGELOG.md requirements.txt
+include run_gui.bat run_gui.sh install-linux.sh install-windows.ps1
+recursive-include src/luna_tpx3_gui/icon *.png *.ico
