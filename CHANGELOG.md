@@ -5,10 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 30-09-2026
 
-First public release. Put the date on this heading when it is tagged, and
-start a fresh `## [Unreleased]` section above it.
+First public release.
 
 Luna is not included: the GUI drives the user's own, unmodified `tpx3dump`.
 There is deliberately no bundled executable on any platform, so the GUI cannot
@@ -32,6 +31,9 @@ Linux and Windows.
 - Linux menu launcher and Windows Desktop shortcut installers.
   `install-linux.sh` builds the private venv (from `requirements.txt`) and the
   Desktop icon by default; `--no-venv` and `--no-desktop-icon` opt out.
+  `install-windows.ps1` likewise builds a venv from `requirements.txt`, at
+  `%USERPROFILE%\venvs\luna-tpx3-gui` (`-VenvName` renames it, `-NoVenv`
+  skips it), and `run_gui.bat` uses that venv too.
 - Packaging: `pyproject.toml` with the `luna-tpx3-gui` console script and the
   `analysis` / `dev` extras; `python -m luna_tpx3_gui` also starts the app.
 - pytest suite for the Qt-free core, ruff via pre-commit, and GitHub Actions
