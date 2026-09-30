@@ -46,8 +46,8 @@ Built with Qt 6 (PySide6).
 | Platform | Setup | Launch |
 |---|---|---|
 | **Ubuntu / Linux** | `./install-linux.sh` — see [Linux](#linux) for the full five steps | Activities menu, or `./run_gui.sh` |
-| **Windows** — way 1 | install WSL + Ubuntu | `run_gui.bat` from PowerShell |
-| **Windows** — way 2 | `.\install-windows.ps1` | double-click the Desktop shortcut |
+| **Windows** — way 1 | install Python, WSL + Ubuntu, then `.\install-windows.ps1` once for the venv | `run_gui.bat` from PowerShell |
+| **Windows** — way 2 | install Python, WSL + Ubuntu, then `.\install-windows.ps1` — builds the venv and the shortcut | double-click the Desktop shortcut |
 | **Any, as a package** | `pip install -e ".[analysis]"` | `luna-tpx3-gui` |
 
 Windows needs WSL for **every** way — see below for why.
@@ -434,15 +434,18 @@ You never open the Ubuntu shell yourself. The GUI drives it.
 Without WSL the GUI still starts and everything except *running* works — build
 the queue, preview the commands, **Export .sh** to run on an Ubuntu box.
 
-## Step 1 — Python and the dependencies
+## Step 1 — Python
+
+Install Python 3.9 or newer from [python.org](https://www.python.org/downloads/),
+keeping the *py launcher* option ticked. That is all you install by hand:
+`.\install-windows.ps1` ([Way 2](#way-2--double-click-no-terminal)) builds a
+private venv at `%USERPROFILE%\venvs\luna-tpx3-gui` with everything in
+`requirements.txt`, and `run_gui.bat` (Way 1) uses that same venv.
+
+To use an interpreter of your own instead, install the dependencies into it:
 
 ```powershell
-py -3 -m pip install PySide6 h5py numpy matplotlib
-```
-
-Check it:
-
-```powershell
+py -3 -m pip install -r requirements.txt
 py -3 -c "import PySide6, h5py, numpy, matplotlib; print('ok')"
 ```
 
@@ -545,8 +548,11 @@ or, from anywhere, in one line:
 ```
 
 The `&` is PowerShell's call operator, needed whenever the command is a quoted
-string. The `.bat` prefers `%USERPROFILE%\venvs\tpx4cam\Scripts\python.exe` and
-falls back to `py -3`.
+string. The `.bat` picks its interpreter in this order: `%LUNA_PYTHON%`, a
+`.venv` beside it, the venv `install-windows.ps1` builds
+(`%USERPROFILE%\venvs\luna-tpx3-gui`), `%USERPROFILE%\venvs\tpx4cam`, then
+`py -3`. If you gave the installer a different `-VenvName`, point
+`LUNA_PYTHON` at that venv's `python.exe`.
 
 It uses `python.exe` deliberately, so a startup error stays readable in the
 console. Do not close that console while the GUI is running — it kills the GUI.
@@ -557,22 +563,31 @@ console. Do not close that console while the GUI is running — it kills the GUI
 .\install-windows.ps1
 ```
 
-That creates a **Luna Tpx3 GUI** shortcut on your Desktop. Double-click it and
-the app starts — no PowerShell, no `cd`, no console window, and WSL still gets
-driven underneath exactly as before.
+That builds a private venv with everything in `requirements.txt` at
+`C:\Users\<you>\venvs\luna-tpx3-gui` (~450 MB), then creates a **Luna Tpx3
+GUI** shortcut on your Desktop. Double-click it and the app starts — no
+PowerShell, no `cd`, no console window, and WSL still gets driven underneath
+exactly as before. No administrator rights are needed.
 
 | Flag | Effect |
 |---|---|
-| *(none)* | Desktop shortcut |
+| *(none)* | venv + Desktop shortcut |
 | `-StartMenu` | also add it to the Start Menu, so it is searchable |
-| `-Python <path>` | use a specific `pythonw.exe` instead of auto-detecting |
-| `-Uninstall` | remove the shortcuts. Leaves the GUI's own files alone. |
+| `-VenvName <name>` | build the venv at `%USERPROFILE%\venvs\<name>` instead |
+| `-NoVenv` | skip the venv and use a Python that already has PySide6 (an earlier venv, `venvs\tpx4cam`, or `pythonw.exe` on `PATH`) |
+| `-Python <path>` | use this specific `pythonw.exe`; implies `-NoVenv` |
+| `-Uninstall` | remove the shortcuts. Leaves the GUI's own files and the venv alone. |
 
-What it does: finds an interpreter that can actually `import PySide6` (checking
-matters — `pythonw.exe` has no console, so an import error would be silent),
-generates `src/luna_tpx3_gui/icon/luna-tpx3-gui.ico` from the 1024×1024 PNG if it is missing, and
-writes a `.lnk` pointing at `pythonw.exe`. Right-click the shortcut → *Pin to
-taskbar* if you want it permanently to hand.
+What it does: builds the venv from whichever Python 3.9+ the `py` launcher
+finds (re-running reuses it and brings its packages up to date), checks that
+the interpreter can actually `import PySide6` — this matters, since
+`pythonw.exe` has no console and an import error would be silent — and writes
+a `.lnk` pointing at the venv's `pythonw.exe`. Right-click the shortcut →
+*Pin to taskbar* if you want it permanently to hand.
+
+After updating the GUI (a new release, or `git pull`), re-run
+`.\install-windows.ps1` if `requirements.txt` changed; otherwise the shortcut
+already runs the new code.
 
 There is deliberately no standalone `.exe` — see the
 [Licence note](#licence-note).

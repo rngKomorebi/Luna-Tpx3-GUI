@@ -2,7 +2,8 @@
 REM Launch Luna Tpx3 GUI (Qt 6) from a terminal.
 REM
 REM Interpreter order:  %LUNA_PYTHON%  ->  .venv beside this script
-REM                     ->  a venv under %USERPROFILE%\venvs  ->  py -3
+REM                     ->  %USERPROFILE%\venvs\luna-tpx3-gui (built by
+REM                         install-windows.ps1)  ->  ...\venvs\tpx4cam  ->  py -3
 REM
 REM Uses python.exe on purpose, so a startup error stays readable in the
 REM console. For a silent double-click launch with no console window, use the
@@ -16,6 +17,10 @@ if defined LUNA_PYTHON if exist "%LUNA_PYTHON%" (
 )
 if exist "%~dp0.venv\Scripts\python.exe" (
   "%~dp0.venv\Scripts\python.exe" "%GUI%" %*
+  goto :done
+)
+if exist "%USERPROFILE%\venvs\luna-tpx3-gui\Scripts\python.exe" (
+  "%USERPROFILE%\venvs\luna-tpx3-gui\Scripts\python.exe" "%GUI%" %*
   goto :done
 )
 if exist "%USERPROFILE%\venvs\tpx4cam\Scripts\python.exe" (

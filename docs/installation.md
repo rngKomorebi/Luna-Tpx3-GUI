@@ -28,5 +28,7 @@ and komorebi_mpl for the Inspect tab, the TDC columns and the plots.
 
 On Linux, `./install-linux.sh` sets up a private venv, a menu launcher and a
 Desktop icon instead (`--no-venv` / `--no-desktop-icon` to skip either); on
-Windows, `.\install-windows.ps1` creates a Desktop shortcut. Both are
+Windows, `.\install-windows.ps1` builds a venv at
+`%USERPROFILE%\venvs\luna-tpx3-gui` and creates a Desktop shortcut
+(`-NoVenv` to use an existing Python, `-VenvName` to rename the venv). Both are
 described in the README.
