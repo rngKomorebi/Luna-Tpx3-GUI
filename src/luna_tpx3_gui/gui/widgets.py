@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QRect, QRectF, Qt, Signal
+from PySide6.QtCore import QDir, QRect, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QPainterPath, QPen
 from PySide6.QtWidgets import (QAbstractItemView, QFrame, QHBoxLayout,
-                               QHeaderView, QLabel, QPushButton, QTableView,
-                               QWidget)
+                               QHeaderView, QLabel, QLineEdit, QPlainTextEdit,
+                               QPushButton, QTableView, QWidget)
 
 # ---------------------------------------------------------------------------
 # small widget helpers
@@ -40,6 +40,68 @@ def row(*widgets, spacing=6, margins=(0, 0, 0, 0)):
         else:
             lay.addWidget(item)
     return w
+
+
+class PathEdit(QLineEdit):
+    """A line edit for a path that takes what Explorer hands it.
+
+    Explorer's "Copy as path" puts quotes around the path; they are dropped
+    as soon as it is pasted. A file or folder dragged in from Explorer lands
+    as its path, not as a file:/// URL, and announces itself through
+    path_dropped so the owner can act on it straight away.
+    """
+
+    path_dropped = Signal(str)
+
+    def __init__(self, text=""):
+        super().__init__(text)
+        self.textChanged.connect(self._unquote)
+
+    def _unquote(self, text):
+        s = text.strip()
+        if len(s) >= 2 and s[0] == s[-1] and s[0] in "\"'":
+            self.setText(s[1:-1])
+
+    def dragEnterEvent(self, ev):
+        if ev.mimeData().hasUrls():
+            ev.acceptProposedAction()
+        else:
+            super().dragEnterEvent(ev)
+
+    def dragMoveEvent(self, ev):
+        if ev.mimeData().hasUrls():
+            ev.acceptProposedAction()
+        else:
+            super().dragMoveEvent(ev)
+
+    def dropEvent(self, ev):
+        urls = [u for u in ev.mimeData().urls() if u.isLocalFile()]
+        if not urls:
+            super().dropEvent(ev)
+            return
+        self.setText(QDir.toNativeSeparators(urls[0].toLocalFile()))
+        ev.acceptProposedAction()
+        self.path_dropped.emit(self.text())
+
+
+class PathsEdit(QPlainTextEdit):
+    """A box of paths, one per line; files or folders dragged in from
+    Explorer are added as their paths, each on its own line."""
+
+    def canInsertFromMimeData(self, source):
+        return source.hasUrls() or super().canInsertFromMimeData(source)
+
+    def insertFromMimeData(self, source):
+        urls = [u for u in source.urls() if u.isLocalFile()] if source.hasUrls() else []
+        if not urls:
+            super().insertFromMimeData(source)
+            return
+        text = self.toPlainText()
+        if text and not text.endswith("\n"):
+            self.moveCursor(self.textCursor().MoveOperation.End)
+            self.insertPlainText("\n")
+        self.insertPlainText("\n".join(QDir.toNativeSeparators(u.toLocalFile())
+                                       for u in urls) + "\n")
 
 
 def button(text, slot=None, accent=False, toggle=False, danger=False, tip=""):
