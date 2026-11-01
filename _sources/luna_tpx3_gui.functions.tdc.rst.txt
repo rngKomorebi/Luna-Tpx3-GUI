@@ -1,0 +1,7 @@
+luna\_tpx3\_gui.functions.tdc module
+====================================
+
+.. automodule:: luna_tpx3_gui.functions.tdc
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>luna_tpx3_gui.functions.flags &mdash; Luna Tpx3 GUI 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Luna Tpx3 GUI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Luna Tpx3 GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#linux">Linux</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#windows">Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API (Qt-free core):</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">luna_tpx3_gui</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Luna Tpx3 GUI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">luna_tpx3_gui.functions.flags</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for luna_tpx3_gui.functions.flags</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""The tpx3dump process flags the Advanced tab offers, and the argv they make.</span>
+
+<span class="sd">One table drives the whole thing -- the widgets, the saved settings, the</span>
+<span class="sd">amber summary on the Process tab, reset, and the command line -- so a flag is</span>
+<span class="sd">added in one place. The notes and defaults are taken from</span>
+<span class="sd">`tpx3dump process --help`; -i / -o are the queue's business and -h is not a</span>
+<span class="sd">processing option, so those three are not listed.</span>
+
+<span class="sd">Qt-free.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOG_LEVELS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">TOF_TDC_REFERENCES</span>
+
+
+<div class="viewcode-block" id="Flag">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.flags.html#luna_tpx3_gui.functions.flags.Flag">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Flag</span><span class="p">:</span>
+    <span class="n">flag</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># as passed, e.g. "--eps-t"</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>            <span class="c1"># settings key; a switch_choice also stores key + "_on"</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># number | int | duration | path | choice | switch | switch_choice</span>
+    <span class="n">default</span><span class="p">:</span> <span class="nb">str</span>        <span class="c1"># tpx3dump's own default, as its --help prints it</span>
+    <span class="n">note</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># one line shown beside the control</span>
+    <span class="n">tip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>       <span class="c1"># the longer story, as a tooltip</span>
+    <span class="n">choices</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span> <span class="c1"># the values offered; the GUI adds a "default" entry</span></div>
+
+
+
+<span class="c1"># Time values carry their unit: tpx3dump parses "100ns", "0.495s", ...</span>
+<span class="n">DURATION_UNITS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"s"</span><span class="p">,</span> <span class="s2">"ms"</span><span class="p">,</span> <span class="s2">"us"</span><span class="p">,</span> <span class="s2">"ns"</span><span class="p">,</span> <span class="s2">"ps"</span><span class="p">,</span> <span class="s2">"fs"</span><span class="p">)</span>
+<span class="n">_DURATION</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\d+(\.\d+)?("</span> <span class="o">+</span> <span class="s2">"|"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DURATION_UNITS</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">")$"</span><span class="p">)</span>
+<span class="n">_INT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\d+$"</span><span class="p">)</span>
+<span class="n">_NUMBER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\d+(\.\d+)?$"</span><span class="p">)</span>
+
+<span class="n">FLAG_GROUPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"Detector and timing"</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--layout"</span><span class="p">,</span> <span class="s2">"layout"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span> <span class="s2">"single"</span><span class="p">,</span>
+             <span class="s2">"chip arrangement: single, quad (2x2) or octal (2x4)"</span><span class="p">,</span>
+             <span class="s2">"Must match the detector the data was taken with."</span><span class="p">,</span>
+             <span class="p">(</span><span class="s2">"single"</span><span class="p">,</span> <span class="s2">"quad"</span><span class="p">,</span> <span class="s2">"octal"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--n-phases"</span><span class="p">,</span> <span class="s2">"n_phases"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span>
+             <span class="s2">"PLL phase correction; 16 minimises the error, 1 = off"</span><span class="p">,</span>
+             <span class="s2">"Number of phases of the acquisition's phase-locked loop. It "</span>
+             <span class="s2">"corrects a timing error in the design of the tpx3 chipboard; "</span>
+             <span class="s2">"tpx3dump's help notes the correction is often applied and that "</span>
+             <span class="s2">"16 minimises the error. 1 turns it off."</span><span class="p">,</span>
+             <span class="p">(</span><span class="s2">"1"</span><span class="p">,</span> <span class="s2">"2"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">,</span> <span class="s2">"8"</span><span class="p">,</span> <span class="s2">"16"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--tof-tdc-reference"</span><span class="p">,</span> <span class="s2">"tof_tdc_reference"</span><span class="p">,</span> <span class="s2">"switch_choice"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span>
+             <span class="s2">"TDC edge that starts the ToF clock; unticked = no ToF"</span><span class="p">,</span>
+             <span class="s2">"Fills PixelHits/tof with each hit's time since the chosen TDC "</span>
+             <span class="s2">"edge. Left unticked, tpx3dump does not compute ToF at all.</span><span class="se">\n</span><span class="s2">"</span>
+             <span class="s2">"Independent of 'Add TDC columns' under After processing, "</span>
+             <span class="s2">"which this GUI computes once tpx3dump is done."</span><span class="p">,</span>
+             <span class="nb">tuple</span><span class="p">(</span><span class="n">TOF_TDC_REFERENCES</span><span class="p">)),</span>
+    <span class="p">]),</span>
+    <span class="p">(</span><span class="s2">"Clustering"</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--eps-s"</span><span class="p">,</span> <span class="s2">"eps_s"</span><span class="p">,</span> <span class="s2">"number"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span>
+             <span class="s2">"largest gap between hits of one cluster, in pixels"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--eps-t"</span><span class="p">,</span> <span class="s2">"eps_t"</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">,</span> <span class="s2">"100ns"</span><span class="p">,</span>
+             <span class="s2">"largest time gap between hits of one cluster, with a unit"</span><span class="p">,</span>
+             <span class="s2">"Write the unit with the number, e.g. 200ns or 1.5us. "</span>
+             <span class="s2">"Valid units: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DURATION_UNITS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--clustering-algorithm"</span><span class="p">,</span> <span class="s2">"clustering_algorithm"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span>
+             <span class="s2">"DFSCluster"</span><span class="p">,</span>
+             <span class="s2">"DFSCluster: stable, slower;  Kuttruff2024: faster, experimental"</span><span class="p">,</span>
+             <span class="s2">"Kuttruff2024: https://doi.org/10.1016/j.ultramic.2023.113864"</span><span class="p">,</span>
+             <span class="p">(</span><span class="s2">"DFSCluster"</span><span class="p">,</span> <span class="s2">"Kuttruff2024"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--kuttruff-buffer-size"</span><span class="p">,</span> <span class="s2">"kuttruff_buffer_size"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"10"</span><span class="p">,</span>
+             <span class="s2">"the B parameter of Kuttruff2024; ignored by DFSCluster"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--disable-clustering"</span><span class="p">,</span> <span class="s2">"disable_clustering"</span><span class="p">,</span> <span class="s2">"switch"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span>
+             <span class="s2">"sort the hits but do not cluster them"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--raw-only"</span><span class="p">,</span> <span class="s2">"raw_only"</span><span class="p">,</span> <span class="s2">"switch"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span>
+             <span class="s2">"unpack the hits only: no sorting, no clustering"</span><span class="p">,</span>
+             <span class="s2">"The TDC columns and the cluster plots need the sorted, "</span>
+             <span class="s2">"clustered output, so they will not work on such a file."</span><span class="p">),</span>
+    <span class="p">]),</span>
+    <span class="p">(</span><span class="s2">"Output file"</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--discard-pixel-data"</span><span class="p">,</span> <span class="s2">"discard_pixel_data"</span><span class="p">,</span> <span class="s2">"switch"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span>
+             <span class="s2">"leave PixelHits out -- usually most of the file"</span><span class="p">,</span>
+             <span class="s2">"The file then holds the clusters only. The pixel hitmap and "</span>
+             <span class="s2">"PixelHits TDC columns need PixelHits."</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--compression-algorithm"</span><span class="p">,</span> <span class="s2">"compression_algorithm"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span>
+             <span class="s2">"None"</span><span class="p">,</span> <span class="s2">"compress the datasets; the default is uncompressed"</span><span class="p">,</span>
+             <span class="s2">"Deflate is gzip and opens anywhere. The Blosc variants are "</span>
+             <span class="s2">"faster, but h5py reads them only with the hdf5plugin package "</span>
+             <span class="s2">"installed -- without it the Inspect tab cannot open the data."</span><span class="p">,</span>
+             <span class="p">(</span><span class="s2">"Deflate"</span><span class="p">,</span> <span class="s2">"BloscLz4"</span><span class="p">,</span> <span class="s2">"BloscLz4hc"</span><span class="p">,</span> <span class="s2">"BloscBlosclz"</span><span class="p">,</span>
+              <span class="s2">"BloscSnappy"</span><span class="p">,</span> <span class="s2">"BloscZlib"</span><span class="p">,</span> <span class="s2">"BloscZstd"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--compression-level"</span><span class="p">,</span> <span class="s2">"compression_level"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span> <span class="s2">"5"</span><span class="p">,</span>
+             <span class="s2">"1 = fastest, 9 = smallest, off = none"</span><span class="p">,</span>
+             <span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="s2">"off"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"2"</span><span class="p">,</span> <span class="s2">"3"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">,</span> <span class="s2">"5"</span><span class="p">,</span> <span class="s2">"6"</span><span class="p">,</span> <span class="s2">"7"</span><span class="p">,</span> <span class="s2">"8"</span><span class="p">,</span> <span class="s2">"9"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--compression-shuffle"</span><span class="p">,</span> <span class="s2">"compression_shuffle"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span> <span class="s2">"Byte"</span><span class="p">,</span>
+             <span class="s2">"byte or bit shuffle before compressing"</span><span class="p">,</span>
+             <span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="s2">"None"</span><span class="p">,</span> <span class="s2">"Bit"</span><span class="p">,</span> <span class="s2">"Byte"</span><span class="p">)),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--compression-nthreads"</span><span class="p">,</span> <span class="s2">"compression_nthreads"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span>
+             <span class="s2">"all cores"</span><span class="p">,</span> <span class="s2">"compression threads; Blosc only"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--hdf5-chunk-size"</span><span class="p">,</span> <span class="s2">"hdf5_chunk_size"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"15000"</span><span class="p">,</span>
+             <span class="s2">"HDF5 chunk size; the help says bytes, files show rows"</span><span class="p">,</span>
+             <span class="s2">"tpx3dump's help gives the unit as bytes, but its output files "</span>
+             <span class="s2">"have chunks of 15000 rows at the default."</span><span class="p">),</span>
+    <span class="p">]),</span>
+    <span class="p">(</span><span class="s2">"Timewalk"</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--calculate-timewalk-statistics"</span><span class="p">,</span> <span class="s2">"calculate_timewalk_statistics"</span><span class="p">,</span>
+             <span class="s2">"switch"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"accumulate timewalk statistics into the output"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--timewalk-file"</span><span class="p">,</span> <span class="s2">"timewalk_file"</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span>
+             <span class="s2">"earlier output to start the statistics from; needs the box above"</span><span class="p">,</span>
+             <span class="s2">"An .hdf5 from a previous tpx3dump run with a timewalk correction "</span>
+             <span class="s2">"matrix. Statistics accumulate on top of it across similar "</span>
+             <span class="s2">"experiments. If the file cannot be read, tpx3dump starts afresh."</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--ctot-cut"</span><span class="p">,</span> <span class="s2">"ctot_cut"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"450"</span><span class="p">,</span>
+             <span class="s2">"cluster ToT (its largest ToT) used to build the timewalk LUT"</span><span class="p">),</span>
+    <span class="p">]),</span>
+    <span class="p">(</span><span class="s2">"Performance and logging"</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--time-bin-interval"</span><span class="p">,</span> <span class="s2">"time_bin_interval"</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">,</span> <span class="s2">"500ms"</span><span class="p">,</span>
+             <span class="s2">"data per processing segment, with a unit; speed and memory only"</span><span class="p">,</span>
+             <span class="s2">"Too small makes processing inefficient. Too large for memory "</span>
+             <span class="s2">"triggers tpx3dump's back-off, which avoids a crash but runs "</span>
+             <span class="s2">"slower. Does not change the output."</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--num-time-bins"</span><span class="p">,</span> <span class="s2">"num_time_bins"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"3"</span><span class="p">,</span>
+             <span class="s2">"segments cached before processing; 3 x 500ms = 1.5 s"</span><span class="p">),</span>
+        <span class="n">Flag</span><span class="p">(</span><span class="s2">"--log-level"</span><span class="p">,</span> <span class="s2">"log_level"</span><span class="p">,</span> <span class="s2">"choice"</span><span class="p">,</span> <span class="s2">"info"</span><span class="p">,</span>
+             <span class="s2">"how much tpx3dump writes to the log"</span><span class="p">,</span>
+             <span class="n">choices</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">lv</span> <span class="k">for</span> <span class="n">lv</span> <span class="ow">in</span> <span class="n">LOG_LEVELS</span> <span class="k">if</span> <span class="n">lv</span><span class="p">)),</span>
+    <span class="p">]),</span>
+<span class="p">]</span>
+
+<span class="n">FLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">_title</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">FLAG_GROUPS</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">group</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="flag_bits">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.flags.html#luna_tpx3_gui.functions.flags.flag_bits">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">flag_bits</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">translate</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""The argv pieces, one list per flag that is set.</span>
+
+<span class="sd">    `values` maps each Flag.key to the control's text (or bool for a switch);</span>
+<span class="sd">    missing keys count as unset. `translate` maps a path-valued flag onto the</span>
+<span class="sd">    machine tpx3dump runs on, e.g. Backend.translate.</span>
+<span class="sd">    """</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">FLAGS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"switch"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"switch_choice"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">key</span> <span class="o">+</span> <span class="s2">"_on"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">key</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"duration"</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"path"</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="flag_args">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.flags.html#luna_tpx3_gui.functions.flags.flag_args">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">flag_args</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">translate</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="n">flag_bits</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">translate</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bit</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="flag_problems">
+<a class="viewcode-back" href="../../../luna_tpx3_gui.functions.flags.html#luna_tpx3_gui.functions.flags.flag_problems">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">flag_problems</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Values tpx3dump would reject, worded for a message box."""</span>
+    <span class="n">problems</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">FLAGS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"number"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"duration"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_DURATION</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="s2">""</span><span class="p">)):</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="si">}</span><span class="s2"> needs a number with a unit, e.g. "</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="si">}</span><span class="s2"> -- got '</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"int"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_INT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="si">}</span><span class="s2"> needs a whole number -- got '</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"number"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_NUMBER</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">flag</span><span class="si">}</span><span class="s2"> needs a number -- got '</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">problems</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Sergei Kulkov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

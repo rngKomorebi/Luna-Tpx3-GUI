@@ -1,0 +1,7 @@
+luna\_tpx3\_gui.functions.plotting module
+=========================================
+
+.. automodule:: luna_tpx3_gui.functions.plotting
+   :members:
+   :show-inheritance:
+   :undoc-members:
