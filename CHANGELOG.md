@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 01-11-2026
+
+### Added
+
+- Inspect HDF5 tab: double-click a dataset (or **View rows...**) to scroll
+  through its rows in a window of their own. Only the rows on screen are read,
+  so even a 300-million-row dataset opens instantly; jump to any row, first or
+  last; column headers give type and unit; Ctrl+C copies the selection.
+- Advanced tab: a control for every `tpx3dump process` option, including the
+  ones that previously needed *extra arguments* (`--layout`, `--n-phases`,
+  `--clustering-algorithm`, `--kuttruff-buffer-size`, `--discard-pixel-data`,
+  the compression options, `--hdf5-chunk-size`, the timewalk options and
+  `--ctot-cut`). Each has a one-line note on what it does and a tooltip with
+  the details and `tpx3dump`'s default.
+- Values `tpx3dump` would reject (a time without its unit, a non-number) are
+  caught before Run, Preview or Export .sh.
+- Help menu above the tabs (F1): a Help window explaining every tab, option
+  and flag, plus name templates, the file's columns and units, TDC and
+  troubleshooting, with a topic list and a Find box. The flag reference is
+  generated from the same table as the Advanced tab, so the two cannot
+  disagree. **All flags explained...** on the Advanced tab jumps straight to
+  it.
+- Path fields (Luna folder, output folder, HDF5 file, timewalk file) drop the
+  quotes of a pasted *Copy as path* and accept a file or folder dragged in
+  from Explorer; the Add folders paste box takes dragged folders too. A path
+  pasted or dropped into **HDF5 file** opens straight away.
+
+### Changed
+
+- Process tab: the amber "Advanced: ..." line is now an **Advanced flags**
+  button -- grey for a plain run, yellow with a count once anything deviates
+  -- that lists every setting in effect, one per row.
+- Process tab: **Add files...** and **Remove** are gone; **Clear all** is now
+  **Clear**. The *Measurement folder* column is gone from **Files found**
+  (hover a row for the full input and output paths).
+- The Light/Dark buttons moved into a **View** menu, left of **Help**.
+- On Windows the file dialogs are Explorer's own (Alt+D, paste into the
+  address bar, Quick Access). They follow Windows' light/dark setting rather
+  than the app's.
+- The flags are defined once, in `functions/flags.py`, which drives the
+  widgets, settings, summary line, reset and command line alike.
+
+### Fixed
+
+- README examples passed `--eps-t 100`; `tpx3dump` expects a unit, e.g.
+  `200ns`.
+- A code comment claimed that without `--tof-tdc-reference` tpx3dump uses a
+  default edge; it computes no ToF at all.
+
 ## [0.1.0] - 30-09-2026
 
 First public release.

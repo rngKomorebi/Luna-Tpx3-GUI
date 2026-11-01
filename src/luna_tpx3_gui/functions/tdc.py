@@ -8,7 +8,7 @@ them, so importing this module needs none of them.
 from __future__ import annotations
 
 # tpx3dump's --tof-tdc-reference: which TDC edge starts the time-of-flight
-# clock. Left off, tpx3dump uses its own default reference.
+# clock. Left off, tpx3dump computes no ToF at all.
 TOF_TDC_REFERENCES = ["TDC1Rising", "TDC1Falling",
                       "TDC2Rising", "TDC2Falling"]
 

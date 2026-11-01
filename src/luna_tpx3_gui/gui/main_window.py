@@ -10,7 +10,7 @@ import traceback
 from pathlib import Path
 
 from PySide6.QtCore import QProcess, Qt, QTimer
-from PySide6.QtGui import QFontDatabase, QIcon
+from PySide6.QtGui import QActionGroup, QFontDatabase, QIcon, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog,
     QDialogButtonBox, QFileDialog, QFrame, QGridLayout, QGroupBox,
@@ -19,12 +19,15 @@ from PySide6.QtWidgets import (
     QSplitter, QTableWidget, QTableWidgetItem, QTabWidget, QVBoxLayout,
     QWidget)
 
-from ..functions.backend import (LOG_LEVELS, Backend, detect_backend,
-                                 drive_letter, win_to_wsl, wsl_missing_paths,
+from .. import __version__
+from ..functions.backend import (Backend, detect_backend, drive_letter,
+                                 win_to_wsl, wsl_missing_paths,
                                  wsl_mount_drive, wsl_unmounted_drives)
 from ..functions.common import (_NO_WINDOW, APP_NAME, ICON_PATH, IS_WINDOWS,
                                 human_size)
 from ..functions.config import load_config, save_config
+from ..functions.flags import (FLAG_GROUPS, flag_args, flag_bits,
+                               flag_problems)
 from ..functions.naming import (DEFAULT_TEMPLATE, PRESET_TEMPLATES,
                                 TEMPLATE_HELP, Job, measurement_context,
                                 migrate_template, render_name)
@@ -37,10 +40,13 @@ from ..functions.tdc import (TDC_DATASET, TDC_REFERENCES,
                              describe_tdc_types, read_tdc_events, read_tdcs,
                              read_with_tdc, tag_times_with_tdc,
                              tdc_reference_edges)
+from .dataset_view import DatasetViewer
+from .help_window import SECTIONS, HelpWindow
 from .models import FolderModel, JobModel
 from .style import (_FONT_MONO_CANDIDATES, _FONT_SANS_CANDIDATES, PALETTES,
                     build_palette, build_qss, pick_font)
-from .widgets import CheckHeader, button, row, table, vline
+from .widgets import (CheckHeader, PathEdit, PathsEdit, button, row, table,
+                      vline)
 
 # ---------------------------------------------------------------------------
 # optional scientific stack (Inspect tab only)
@@ -121,12 +127,10 @@ class MainWindow(QMainWindow):
         outer.setContentsMargins(12, 10, 12, 12)
         outer.setSpacing(8)
 
-        # header: title + theme toggle
+        # header: title (the theme lives in the View menu)
         title = QLabel(APP_NAME)
         title.setProperty("heading", True)
-        self.b_light = button("Light", lambda: self.apply_theme("light"), toggle=True)
-        self.b_dark = button("Dark", lambda: self.apply_theme("dark"), toggle=True)
-        outer.addWidget(row(title, None, self.b_light, self.b_dark, spacing=4))
+        outer.addWidget(title)
 
         self.tabs = QTabWidget()
         outer.addWidget(self.tabs, 1)
@@ -142,6 +146,8 @@ class MainWindow(QMainWindow):
         self._build_process(self.tab_process)
         self._build_inspect(self.tab_inspect)
         self._connect_option_signals()
+        self.help = None              # built on first use, then kept
+        self._build_menu()
 
         self.apply_theme(self.theme_name)
         self.refresh_backend()
@@ -167,12 +173,14 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         app.setPalette(build_palette(self.pal))
         app.setStyleSheet(build_qss(self.pal, self.sans, self.mono))
-        self.b_light.setChecked(self.theme_name == "light")
-        self.b_dark.setChecked(self.theme_name == "dark")
+        self.a_light.setChecked(self.theme_name == "light")
+        self.a_dark.setChecked(self.theme_name == "dark")
         # Repaint model-driven colours (status text) under the new palette,
         # including the hand-drawn checkbox in the queue header.
         if getattr(self, "jhead", None):
             self.jhead.set_palette(self.pal)
+        if getattr(self, "help", None):
+            self.help.set_palette(self.pal)
         self.job_model.reset()
         self.sync_overwrite_header()
         self.folder_model.reset()
@@ -194,32 +202,26 @@ class MainWindow(QMainWindow):
 
         self.lbl_status = QLabel("")
         self.b_setup = button("Set up Luna...", self.goto_advanced)
-        lay.addWidget(row(self.lbl_status, None, self.b_setup))
-
         # Non-default settings are invisible from here otherwise, and silently
-        # renamed or relocated output is the surprise worth never having.
-        self.lbl_adv = QLabel("")
-        self.lbl_adv.setProperty("role", "warn")
-        self.lbl_adv.setWordWrap(True)
-        lay.addWidget(self.lbl_adv)
+        # renamed or relocated output is the surprise worth never having: the
+        # button turns yellow the moment anything deviates from the plain run,
+        # and lists it all on a click.
+        self.b_adv = button("Advanced flags", self.show_adv_flags)
+        lay.addWidget(row(self.lbl_status, None, self.b_adv, self.b_setup))
 
-        # Additive actions on the left, destructive ones pushed to the far
-        # right so "Clear all" can never be hit while reaching for "Add".
+        # Additive actions on the left, the destructive one pushed to the far
+        # right so "Clear" can never be hit while reaching for "Add".
         cap_in = QLabel("Input")
         cap_in.setProperty("muted", True)
         lay.addWidget(row(
             cap_in,
-            button("Add files...", self.add_files,
-                   tip="Queue individual .tpx3 files"),
             button("Add folders...", self.add_folders_dialog,
                    tip="Queue every .tpx3 found under one or more folders"),
             vline(),
             button("Rescan", self.scan_folders,
                    tip="Re-read the batch folders and queue anything new"),
             None,
-            button("Remove", self.remove_any, danger=True,
-                   tip="Remove the selected folder(s) or file(s) from the queue"),
-            button("Clear all", self.clear_queue, danger=True,
+            button("Clear", self.clear_queue, danger=True,
                    tip="Empty the queue and the folder list"),
         ))
 
@@ -254,8 +256,8 @@ class MainWindow(QMainWindow):
         cap_r = QLabel("Files found")
         cap_r.setProperty("muted", True)
         rlay.addWidget(cap_r)
-        self.jtable = table(self.job_model, stretch_cols=(3, 5),
-                            widths=(110, 175, 70, 320, 108, 165))
+        self.jtable = table(self.job_model, stretch_cols=(3,),
+                            widths=(110, 175, 70, 320, 108))
         self.jhead = CheckHeader(JobModel.OVER, self.pal,
                                  JobModel.HEADERS[JobModel.OVER], self.jtable)
         self.jtable.setHorizontalHeader(self.jhead)
@@ -264,9 +266,9 @@ class MainWindow(QMainWindow):
         self.jhead.setHighlightSections(False)
         for i in range(self.job_model.columnCount()):
             self.jhead.setSectionResizeMode(
-                i, QHeaderView.ResizeMode.Stretch if i in (3, 5)
+                i, QHeaderView.ResizeMode.Stretch if i == 3
                 else QHeaderView.ResizeMode.Interactive)
-        for i, w in enumerate((110, 175, 70, 320, 108, 165)):
+        for i, w in enumerate((110, 175, 70, 320, 108)):
             self.jtable.setColumnWidth(i, w)
         self.jhead.setSectionsClickable(True)   # setHorizontalHeader can reset it
         self.jhead.box_clicked.connect(self.toggle_all_overwrite)
@@ -336,9 +338,10 @@ class MainWindow(QMainWindow):
         gl.setVerticalSpacing(8)
         gl.setColumnStretch(1, 1)
         gl.addWidget(QLabel("Folder:"), 0, 0)
-        self.e_luna = QLineEdit(self.cfg.get("luna_dir", ""))
+        self.e_luna = PathEdit(self.cfg.get("luna_dir", ""))
         self.e_luna.setPlaceholderText("the folder containing bin/tpx3dump")
         self.e_luna.editingFinished.connect(self.refresh_backend)
+        self.e_luna.path_dropped.connect(lambda _p: self.refresh_backend())
         gl.addWidget(self.e_luna, 0, 1)
         gl.addWidget(button("Browse...", self.pick_luna), 0, 2)
         gl.addWidget(button("Check install", self.check_install), 0, 3)
@@ -365,7 +368,7 @@ class MainWindow(QMainWindow):
                          spacing=18), 0, 0, 1, 3)
 
         go.addWidget(QLabel("Output folder:"), 1, 0)
-        self.e_outdir = QLineEdit(self.cfg.get("out_dir", ""))
+        self.e_outdir = PathEdit(self.cfg.get("out_dir", ""))
         self.e_outdir.setPlaceholderText("used by the two 'Output folder' modes")
         self.e_outdir.textChanged.connect(lambda _t: self.recompute_outputs())
         go.addWidget(self.e_outdir, 1, 1)
@@ -401,63 +404,57 @@ class MainWindow(QMainWindow):
         lay.addWidget(g_out)
 
         # Flags -------------------------------------------------------------
-        # A label/field grid, two flags per row, so every field keeps its full
-        # height and the labels line up instead of running into each other.
+        # One flag per row -- name, control, a one-line note -- built from
+        # FLAG_GROUPS, so the notes line up in a column and a new flag needs
+        # no layout work. The full story is in each row's tooltip.
         g_opt = QGroupBox("tpx3dump flags  (blank = tpx3dump's own default)")
         gf = QGridLayout(g_opt)
-        gf.setHorizontalSpacing(8)
-        gf.setVerticalSpacing(8)
-        gf.setColumnMinimumWidth(2, 24)       # gutter between the two pairs
-        gf.setColumnStretch(5, 1)
+        gf.setHorizontalSpacing(10)
+        gf.setVerticalSpacing(6)
+        gf.setColumnStretch(2, 1)
         right = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        self.flag_w = {}
+        r = 0
+        for title, group in FLAG_GROUPS:
+            cap = QLabel(title)
+            cap.setProperty("muted", True)
+            if r:
+                gf.setRowMinimumHeight(r, 10)     # air above every group but the first
+                r += 1
+            gf.addWidget(cap, r, 0, 1, 3)
+            r += 1
+            for f in group:
+                label = QLabel(f.flag)
+                note = QLabel(f.note)
+                note.setProperty("faint", True)
+                ctl = self._flag_control(f)
+                tip = f.note + (".\n\n" + f.tip if f.tip else ".")
+                if f.default:
+                    tip += "\n\ntpx3dump's default: " + f.default
+                for w in (label, ctl, note):
+                    w.setToolTip(tip)
+                gf.addWidget(label, r, 0, right)
+                if f.kind == "path":
+                    # A path needs the width; its note goes underneath.
+                    gf.addWidget(ctl, r, 1, 1, 2)
+                    r += 1
+                    gf.addWidget(note, r, 1, 1, 2)
+                else:
+                    gf.addWidget(ctl, r, 1)
+                    gf.addWidget(note, r, 2)
+                r += 1
 
-        def field(r, c, label, key, width=120):
-            gf.addWidget(QLabel(label), r, c, right)
-            e = QLineEdit(str(self.cfg.get(key, "")))
-            e.setPlaceholderText("default")
-            e.setFixedWidth(width)
-            gf.addWidget(e, r, c + 1)
-            return e
-
-        self.e_eps_s = field(0, 0, "--eps-s", "eps_s")
-        self.e_eps_t = field(0, 3, "--eps-t", "eps_t")
-        self.e_ntb = field(1, 0, "--num-time-bins", "num_time_bins")
-        self.e_tbi = field(1, 3, "--time-bin-interval", "time_bin_interval")
-
-        gf.addWidget(QLabel("--log-level"), 2, 0, right)
-        self.c_log = QComboBox()
-        self.c_log.addItems(LOG_LEVELS)
-        self.c_log.setCurrentText(self.cfg.get("log_level", ""))
-        self.c_log.setFixedWidth(120)
-        gf.addWidget(self.c_log, 2, 1)
-
-        self.cb_raw = QCheckBox("--raw-only")
-        self.cb_raw.setChecked(bool(self.cfg.get("raw_only", False)))
-        self.cb_noclust = QCheckBox("--disable-clustering")
-        self.cb_noclust.setChecked(bool(self.cfg.get("disable_clustering", False)))
-        # The flag takes a value, so the checkbox -- not a blank combo entry --
-        # is what decides whether it is passed at all. That way an unchecked
-        # flag still remembers which reference was last picked.
-        self.cb_tof = QCheckBox("--tof-tdc-reference")
-        self.cb_tof.setChecked(bool(self.cfg.get("tof_tdc_reference_on", False)))
-        self.c_tof = QComboBox()
-        self.c_tof.addItems(TOF_TDC_REFERENCES)
-        self.c_tof.setCurrentText(self.cfg.get("tof_tdc_reference",
-                                               TOF_TDC_REFERENCES[0]))
-        self.c_tof.setMinimumWidth(130)
-        self.c_tof.setEnabled(self.cb_tof.isChecked())
-        self.cb_tof.toggled.connect(self.c_tof.setEnabled)
-        gf.addWidget(row(self.cb_raw, self.cb_noclust, vline(),
-                         self.cb_tof, self.c_tof, None, spacing=14),
-                     3, 0, 1, 6)
-
-        gf.addWidget(QLabel("extra arguments:"), 4, 0, right)
+        gf.setRowMinimumHeight(r, 10)
+        gf.addWidget(QLabel("extra arguments"), r + 1, 0, right)
         self.e_extra = QLineEdit(self.cfg.get("extra", ""))
-        gf.addWidget(self.e_extra, 4, 1, 1, 5)
-        hint = QLabel("Anything not listed above goes here verbatim -- "
+        gf.addWidget(self.e_extra, r + 1, 1, 1, 2)
+        hint = QLabel("Passed verbatim, after the flags above -- "
                       "'Check install' prints the authoritative flag list.")
         hint.setProperty("faint", True)
-        gf.addWidget(hint, 5, 1, 1, 5)
+        gf.addWidget(hint, r + 2, 1, 1, 2)
+        gf.addWidget(row(None, button("All flags explained...",
+                                      lambda: self.show_help("flags"))),
+                     r + 3, 0, 1, 3)
         lay.addWidget(g_opt)
 
         # After processing ---------------------------------------------------
@@ -498,15 +495,85 @@ class MainWindow(QMainWindow):
             button("Back to Process", lambda: self.tabs.setCurrentWidget(self.tab_process)),
             margins=(12, 6, 12, 10)))
 
+    def _flag_control(self, f):
+        """The input widget for one tpx3dump flag, filled from the settings."""
+        saved = self.cfg.get(f.key, "")
+        if f.kind == "switch":
+            cb = QCheckBox()
+            cb.setChecked(bool(saved))
+            self.flag_w[f.key] = cb
+            return cb
+        if f.kind in ("choice", "switch_choice"):
+            # Item data is what gets passed; a plain choice leads with an
+            # entry naming tpx3dump's default, whose data "" passes nothing.
+            c = QComboBox()
+            if f.kind == "choice":
+                c.addItem(f"default ({f.default})", "")
+            for ch in f.choices:
+                if ch:
+                    c.addItem(ch, ch)
+            c.setCurrentIndex(max(c.findData(str(saved)), 0))
+            c.setFixedWidth(170)
+            self.flag_w[f.key] = c
+            if f.kind == "choice":
+                return c
+            # The flag takes a value, so the checkbox -- not a blank combo
+            # entry -- decides whether it is passed at all. That way an
+            # unchecked flag still remembers which value was last picked.
+            cb = QCheckBox()
+            cb.setChecked(bool(self.cfg.get(f.key + "_on", False)))
+            c.setEnabled(cb.isChecked())
+            cb.toggled.connect(c.setEnabled)
+            self.flag_w[f.key + "_on"] = cb
+            return row(cb, c, None, spacing=4)
+        e = PathEdit(str(saved)) if f.kind == "path" else QLineEdit(str(saved))
+        e.setPlaceholderText(f.default or "")
+        self.flag_w[f.key] = e
+        if f.kind == "path":
+            return row(e, button("Browse...", lambda: self._pick_flag_file(e)))
+        e.setFixedWidth(170)
+        return e
+
+    def _pick_flag_file(self, edit):
+        p, _ = QFileDialog.getOpenFileName(
+            self, "Select an earlier tpx3dump output", edit.text(),
+            "HDF5 (*.hdf5 *.h5);;All files (*)", "", self.DLG)
+        if p:
+            edit.setText(p)
+
+    def flag_values(self):
+        """Every flag control's state, keyed as FLAGS and the settings are."""
+        vals = {}
+        for key, w in self.flag_w.items():
+            if isinstance(w, QCheckBox):
+                vals[key] = w.isChecked()
+            elif isinstance(w, QComboBox):
+                vals[key] = w.currentData()
+            else:
+                vals[key] = w.text()
+        return vals
+
+    def flags_ok(self):
+        problems = flag_problems(self.flag_values())
+        if problems:
+            QMessageBox.critical(self, APP_NAME,
+                                 "Fix these on the Advanced tab first:\n\n"
+                                 + "\n".join(problems))
+        return not problems
+
     def _connect_option_signals(self):
-        for w in (self.e_template, self.e_eps_s, self.e_eps_t, self.e_ntb,
-                  self.e_tbi, self.e_extra):
+        for w in (self.e_template, self.e_extra):
             w.textChanged.connect(self.update_adv_summary)
-        self.c_log.currentTextChanged.connect(self.update_adv_summary)
-        self.c_tof.currentTextChanged.connect(self.update_adv_summary)
+        for w in self.flag_w.values():
+            if isinstance(w, QCheckBox):
+                w.toggled.connect(self.update_adv_summary)
+            elif isinstance(w, QComboBox):
+                w.currentTextChanged.connect(self.update_adv_summary)
+            else:
+                w.textChanged.connect(self.update_adv_summary)
         self.c_tdcref.currentTextChanged.connect(self.update_adv_summary)
-        for w in (self.cb_skip, self.cb_raw, self.cb_noclust, self.cb_tof,
-                  self.cb_tdc, self.rb_beside, self.rb_flat, self.rb_mirror):
+        for w in (self.cb_skip, self.cb_tdc, self.rb_beside, self.rb_flat,
+                  self.rb_mirror):
             w.toggled.connect(self.update_adv_summary)
         # One TDC reference, two places to set it. setCurrentText is a no-op
         # when the text already matches, so Qt emits nothing back and the pair
@@ -526,43 +593,112 @@ class MainWindow(QMainWindow):
     def goto_advanced(self):
         self.tabs.setCurrentWidget(self.tab_advanced)
 
-    def advanced_summary(self):
-        """Short description of everything that deviates from the plain run."""
+    def _build_menu(self):
+        # View: the theme, as one checked choice of two.
+        v = self.menuBar().addMenu("&View")
+        themes = QActionGroup(self)
+        themes.setExclusive(True)
+        self.a_light = v.addAction("Light theme", lambda: self.apply_theme("light"))
+        self.a_dark = v.addAction("Dark theme", lambda: self.apply_theme("dark"))
+        for a in (self.a_light, self.a_dark):
+            a.setCheckable(True)
+            themes.addAction(a)
+
+        m = self.menuBar().addMenu("&Help")
+        a = m.addAction("Help contents", lambda: self.show_help("start"))
+        a.setShortcut(QKeySequence.StandardKey.HelpContents)
+        m.addSeparator()
+        for anchor, title in SECTIONS:
+            if anchor not in ("start", "about"):
+                m.addAction(title, lambda a=anchor: self.show_help(a))
+        m.addSeparator()
+        m.addAction("About " + APP_NAME, self.show_about)
+
+    def show_help(self, anchor):
+        if self.help is None:
+            self.help = HelpWindow(self.pal, self.mono, self)
+        self.help.show()
+        self.help.raise_()
+        self.help.activateWindow()
+        self.help.show_section(anchor)
+
+    def show_about(self):
+        QMessageBox.about(
+            self, "About " + APP_NAME,
+            f"<b>{APP_NAME}</b> {__version__}<br><br>"
+            "A batch front end for Luna's <code>tpx3dump</code>, with an HDF5 "
+            "inspector and TDC tagging.<br><br>"
+            "It runs your own, unmodified Luna installation and contains no "
+            "part of it.<br><br>Press F1 for help.")
+
+    def advanced_bits(self):
+        """Everything that deviates from the plain run, one item per setting."""
         bits = []
         mode = self.out_mode()
+        outdir = self.e_outdir.text().strip() or "(no folder chosen)"
         if mode == "flat":
-            bits.append("output into one folder")
+            bits.append("output into one folder: " + outdir)
         elif mode == "mirror":
-            bits.append("output into a mirrored tree")
+            bits.append("output into a mirrored tree under " + outdir)
         tmpl = self.e_template.text().strip()
         if tmpl and tmpl != DEFAULT_TEMPLATE:
             bits.append("renaming to " + tmpl)
         if not self.cb_skip.isChecked():
             bits.append("OVERWRITING existing output")
-        for flag, w in (("--eps-s", self.e_eps_s), ("--eps-t", self.e_eps_t),
-                        ("--num-time-bins", self.e_ntb),
-                        ("--time-bin-interval", self.e_tbi)):
-            val = w.text().strip()
-            if val:
-                bits.append(flag + " " + val)
-        if self.c_log.currentText().strip():
-            bits.append("--log-level " + self.c_log.currentText().strip())
-        if self.cb_raw.isChecked():
-            bits.append("--raw-only")
-        if self.cb_noclust.isChecked():
-            bits.append("--disable-clustering")
-        if self.cb_tof.isChecked():
-            bits.append("--tof-tdc-reference " + self.c_tof.currentText())
+        bits += [" ".join(b) for b in flag_bits(self.flag_values())]
         if self.e_extra.text().strip():
-            bits.append(self.e_extra.text().strip())
+            bits.append("extra arguments: " + self.e_extra.text().strip())
         if self.cb_tdc.isChecked():
-            bits.append("TDC columns (" + self.c_tdcref.currentText() + ")")
-        return ", ".join(bits)
+            bits.append("TDC columns after processing (" +
+                        self.c_tdcref.currentText() + ")")
+        return bits
 
     def update_adv_summary(self, *_a):
-        text = self.advanced_summary()
-        self.lbl_adv.setText(("Advanced: " + text) if text else "")
-        self.lbl_adv.setVisible(bool(text))
+        bits = self.advanced_bits()
+        self.b_adv.setText(f"Advanced flags ({len(bits)})" if bits
+                           else "Advanced flags")
+        self.b_adv.setProperty("adv", "on" if bits else "off")
+        self.b_adv.setToolTip("\n".join(bits) if bits else
+                              "Nothing set: every file runs as plain\n"
+                              "tpx3dump process -i NAME.tpx3 -o NAME.hdf5")
+        self.b_adv.style().unpolish(self.b_adv)
+        self.b_adv.style().polish(self.b_adv)
+
+    def show_adv_flags(self):
+        """List every setting in effect, one per row."""
+        bits = self.advanced_bits()
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Advanced flags in effect")
+        dlg.resize(620, 380)
+        lay = QVBoxLayout(dlg)
+        lay.setContentsMargins(14, 14, 14, 12)
+        lay.setSpacing(8)
+        if bits:
+            head = QLabel(f"{len(bits)} setting(s) differ from the plain run "
+                          "and apply to every queued file:")
+            head.setProperty("muted", True)
+            lay.addWidget(head)
+            lst = QListWidget()
+            lst.setSpacing(3)
+            lst.addItems(bits)
+            lst.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+            lay.addWidget(lst, 1)
+        else:
+            head = QLabel("Nothing set. Every queued file runs as")
+            head.setProperty("intro", True)
+            cmd = QLabel("tpx3dump process -i NAME.tpx3 -o NAME.hdf5")
+            cmd.setProperty("code", True)
+            lay.addWidget(head)
+            lay.addWidget(cmd)
+            lay.addStretch(1)
+
+        def edit():
+            dlg.accept()
+            self.goto_advanced()
+
+        lay.addWidget(row(button("Change on the Advanced tab", edit), None,
+                          button("Close", dlg.reject)))
+        dlg.exec()
 
     def reset_advanced(self):
         if QMessageBox.question(
@@ -577,28 +713,18 @@ class MainWindow(QMainWindow):
         self.e_outdir.clear()
         self.e_template.setText(DEFAULT_TEMPLATE)
         self.cb_skip.setChecked(True)
-        for w in (self.e_eps_s, self.e_eps_t, self.e_ntb, self.e_tbi, self.e_extra):
-            w.clear()
-        self.c_log.setCurrentText("")
-        self.cb_raw.setChecked(False)
-        self.cb_noclust.setChecked(False)
-        self.cb_tof.setChecked(False)
-        self.c_tof.setCurrentText(TOF_TDC_REFERENCES[0])
+        self.e_extra.clear()
+        for w in self.flag_w.values():
+            if isinstance(w, QCheckBox):
+                w.setChecked(False)
+            elif isinstance(w, QComboBox):
+                w.setCurrentIndex(0)    # the default, or the first TDC reference
+            else:
+                w.clear()
         self.cb_tdc.setChecked(False)
         self.c_tdcref.setCurrentText(TDC_REFERENCES[0])
         self.recompute_outputs()
         self.log("Advanced settings reset to defaults.")
-
-    def remove_any(self):
-        """One Remove button for whichever list has a selection."""
-        if self.ftable.selectionModel().selectedRows():
-            self.remove_folders()
-        elif self.jtable.selectionModel().selectedRows():
-            self.remove_selected()
-        else:
-            QMessageBox.information(self, APP_NAME,
-                                    "Select a row first -- either a folder on the "
-                                    "left or a file on the right.")
 
     # -- logging ----------------------------------------------------------
 
@@ -609,7 +735,13 @@ class MainWindow(QMainWindow):
 
     # -- Luna install -----------------------------------------------------
 
-    DLG = QFileDialog.Option.DontUseNativeDialog   # so dialogs follow the theme
+    # On Windows the file dialogs are Explorer's own, so everything learnt
+    # there works unchanged: Alt+D for the address bar, pasting a path into
+    # it, Ctrl+A, Quick Access, recent folders. The price is that they follow
+    # Windows' light/dark setting rather than this app's. Elsewhere Qt's own
+    # dialog keeps the app theme.
+    DLG = (QFileDialog.Option(0) if IS_WINDOWS
+           else QFileDialog.Option.DontUseNativeDialog)
 
     def pick_luna(self):
         d = QFileDialog.getExistingDirectory(
@@ -662,15 +794,6 @@ class MainWindow(QMainWindow):
                 self.log("failed: " + str(exc))
 
     # -- queue management -------------------------------------------------
-
-    def add_files(self):
-        paths, _ = QFileDialog.getOpenFileNames(
-            self, "Select .tpx3 files",
-            self.cfg.get("last_input", str(Path.home())),
-            "Timepix3 raw (*.tpx3);;All files (*)", "", self.DLG)
-        if paths:
-            self.cfg["last_input"] = str(Path(paths[0]).parent)
-            self._add([Path(p) for p in paths])
 
     @staticmethod
     def _scan_folder(path, recursive=True):
@@ -779,21 +902,6 @@ class MainWindow(QMainWindow):
             self.jobs[:] = keep
         return gone
 
-    def remove_folders(self):
-        rows = [i.row() for i in self.ftable.selectionModel().selectedRows()]
-        if not rows:
-            QMessageBox.information(self, APP_NAME,
-                                    "Select one or more folders in the "
-                                    "'Folders to process' list first.")
-            return
-        drop = {self.folders[r]["path"] for r in rows}
-        self.folders = [f for f in self.folders if f["path"] not in drop]
-        # Only drop the files that folder contributed; hand-picked files stay.
-        self.jobs = [j for j in self.jobs if j.origin not in drop]
-        self.folder_model.reset()
-        self.recompute_outputs()
-        self.log(f"Removed {len(drop)} folder(s); {len(self.jobs)} file(s) left queued.")
-
     def add_folders_dialog(self):
         dlg = QDialog(self)
         dlg.setWindowTitle("Add folders to the batch")
@@ -830,8 +938,9 @@ class MainWindow(QMainWindow):
         lay.addWidget(row(button("Browse...", browse),
                           button("Remove selected", drop_selected), hint, None))
 
-        lay.addWidget(QLabel("...or paste paths, one per line:"))
-        paste = QPlainTextEdit()
+        lay.addWidget(QLabel("...or paste paths, one per line, or drag folders "
+                             "in from Explorer:"))
+        paste = PathsEdit()
         paste.setFixedHeight(120)
         lay.addWidget(paste, 1)
 
@@ -875,13 +984,6 @@ class MainWindow(QMainWindow):
             self.recompute_outputs()
             self.log(f"Added {added} file(s); queue now has {len(self.jobs)}.")
         return added
-
-    def remove_selected(self):
-        rows = {i.row() for i in self.jtable.selectionModel().selectedRows()}
-        if not rows:
-            return
-        self.jobs = [j for i, j in enumerate(self.jobs) if i not in rows]
-        self.recompute_outputs()
 
     def clear_queue(self):
         self.jobs = []
@@ -1028,23 +1130,11 @@ class MainWindow(QMainWindow):
 
     # -- command construction --------------------------------------------
 
-    def tpx3dump_args(self, job, backend=None):
+    def tpx3dump_args(self, job, backend=None, translate=None):
+        """`translate` maps a path-valued flag; the backend's own by default."""
         b = backend or self.backend
         args = ["process", "-i", b.translate(job.src), "-o", b.translate(job.dst)]
-        for flag, getter in (("--eps-s", self.e_eps_s.text),
-                             ("--eps-t", self.e_eps_t.text),
-                             ("--num-time-bins", self.e_ntb.text),
-                             ("--time-bin-interval", self.e_tbi.text),
-                             ("--log-level", self.c_log.currentText)):
-            val = getter().strip()
-            if val:
-                args += [flag, val]
-        if self.cb_raw.isChecked():
-            args.append("--raw-only")
-        if self.cb_noclust.isChecked():
-            args.append("--disable-clustering")
-        if self.cb_tof.isChecked():
-            args += ["--tof-tdc-reference", self.c_tof.currentText()]
+        args += flag_args(self.flag_values(), translate or b.translate)
         extra = self.e_extra.text().strip()
         if extra:
             args += shlex.split(extra, posix=True)
@@ -1067,6 +1157,8 @@ class MainWindow(QMainWindow):
         if not self.jobs:
             QMessageBox.information(self, APP_NAME, "The queue is empty.")
             return
+        if not self.flags_ok():
+            return
         self.log("=" * 78)
         self.log(f"{len(self.jobs)} job(s), backend = {self.backend.kind}")
         b = self.backend if self.backend.usable else Backend("native", "tpx3dump")
@@ -1081,7 +1173,9 @@ class MainWindow(QMainWindow):
         if not self.jobs:
             QMessageBox.information(self, APP_NAME, "The queue is empty.")
             return
-        path, _ = QFileDialog.getSaveFileName(
+        if not self.flags_ok():
+            return
+        path, _ =QFileDialog.getSaveFileName(
             self, "Save a shell script to run on Linux", "run_tpx3dump.sh",
             "Shell script (*.sh)", "", self.DLG)
         if not path:
@@ -1121,7 +1215,7 @@ class MainWindow(QMainWindow):
                 continue
             src = under(job.src, in_root, "IN_ROOT")
             dst = under(job.dst, out_root, "OUT_ROOT")
-            tail = [shlex.quote(a) for a in self.tpx3dump_args(job, b)[5:]]
+            tail = [shlex.quote(a) for a in self.tpx3dump_args(job, b, posix)[5:]]
             lines.append('mkdir -p "$(dirname ' + dst + ')"')
             lines.append(" ".join(['"$TPX3DUMP"', "process", "-i", src, "-o", dst] + tail))
         try:
@@ -1150,7 +1244,9 @@ class MainWindow(QMainWindow):
                                  "Choose an output folder on the Advanced tab, or "
                                  "switch back to 'Next to the input file'.")
             return
-        clashes = [j for j in self.jobs if j.status == "CLASH"]
+        if not self.flags_ok():
+            return
+        clashes =[j for j in self.jobs if j.status == "CLASH"]
         if clashes:
             QMessageBox.warning(
                 self, APP_NAME,
@@ -1391,14 +1487,7 @@ class MainWindow(QMainWindow):
             "luna_dir": self.e_luna.text(), "out_mode": self.out_mode(),
             "out_dir": self.e_outdir.text(), "template": self.e_template.text(),
             "skip_existing": self.cb_skip.isChecked(),
-            "eps_s": self.e_eps_s.text(), "eps_t": self.e_eps_t.text(),
-            "num_time_bins": self.e_ntb.text(),
-            "time_bin_interval": self.e_tbi.text(),
-            "log_level": self.c_log.currentText(),
-            "raw_only": self.cb_raw.isChecked(),
-            "disable_clustering": self.cb_noclust.isChecked(),
-            "tof_tdc_reference_on": self.cb_tof.isChecked(),
-            "tof_tdc_reference": self.c_tof.currentText(),
+            **self.flag_values(),
             "tdc_columns": self.cb_tdc.isChecked(),
             "tdc_reference": self.c_tdcref.currentText(),
             "extra": self.e_extra.text(),
@@ -1427,7 +1516,10 @@ class MainWindow(QMainWindow):
         lay.setContentsMargins(10, 12, 10, 10)
         lay.setSpacing(8)
 
-        self.e_h5 = QLineEdit()
+        # Paste or drop a path and press Enter: it opens like Open does.
+        self.e_h5 = PathEdit()
+        self.e_h5.returnPressed.connect(self.open_h5)
+        self.e_h5.path_dropped.connect(lambda _p: self.open_h5())
         lay.addWidget(row("HDF5 file:", self.e_h5,
                           button("Browse...", self.pick_h5),
                           button("Open", self.open_h5),
@@ -1435,12 +1527,19 @@ class MainWindow(QMainWindow):
 
         cap = QLabel("Datasets")
         cap.setProperty("muted", True)
-        lay.addWidget(cap)
+        cap_hint = QLabel("double-click one to scroll through its rows")
+        cap_hint.setProperty("faint", True)
+        lay.addWidget(row(cap, cap_hint, None,
+                          button("View rows...", self.view_dataset),
+                          spacing=10))
         self.itable = QTableWidget(0, 5)
         self.itable.setHorizontalHeaderLabels(
             ["Name", "Shape", "Dtype", "Chunks", "Compression"])
         self.itable.verticalHeader().setVisible(False)
         self.itable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.itable.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.itable.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.itable.cellDoubleClicked.connect(lambda r, _c: self.view_dataset(r))
         ihdr = self.itable.horizontalHeader()
         ihdr.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         ihdr.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
@@ -1504,6 +1603,7 @@ class MainWindow(QMainWindow):
         path = Path(self.e_h5.text())
         self.itable.setRowCount(0)
         self.isum.clear()
+        self.h5_listed = path          # what the Datasets table describes
         if not path.is_file():
             self.isum.setPlainText("No such file: " + str(path))
             return
@@ -1557,6 +1657,24 @@ class MainWindow(QMainWindow):
                 self.isum.setPlainText("\n".join(lines))
         except Exception:
             self.isum.setPlainText(traceback.format_exc())
+
+    def view_dataset(self, r=None):
+        """Open a scrollable window onto one dataset of the open file."""
+        if r is None or r is False:
+            r = self.itable.currentRow()
+        item = self.itable.item(r, 0) if r >= 0 else None
+        if item is None:
+            QMessageBox.information(self, APP_NAME,
+                                    "Open a file and select a dataset first.")
+            return
+        h5py, np = require_h5py(self)
+        if h5py is None:
+            return
+        try:
+            DatasetViewer(self.h5_listed, item.text(), h5py, np,
+                          self.mono, self).show()
+        except Exception as exc:
+            QMessageBox.critical(self, APP_NAME, str(exc))
 
     def _tdc_summary(self, f, np):
         """The TDC block of the Inspect summary: edges, rate, columns."""

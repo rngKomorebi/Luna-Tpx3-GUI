@@ -125,8 +125,11 @@ Scanned 2 folder(s): 4 file(s) queued, 4 new
 **Folders to process** shows each folder with its `.tpx3` count. The list is
 remembered between sessions, so the next time you open the GUI the batch is
 already there. A folder added twice, or a file reachable through two folders,
-is queued only once. **Remove** on a folder drops only the files that folder
-contributed; files you picked by hand with **Add files...** stay.
+is queued only once. **Clear** empties the folder list and the queue.
+
+On Windows, **Browse...** is Explorer's own folder picker, so Alt+D, pasting
+into its address bar and Quick Access all work. You can also drag folders
+from Explorer into the paste box.
 
 ### 3. Keep up with a live campaign: Rescan
 
@@ -199,23 +202,42 @@ template to avoid this.
 
 ### 5. The same `tpx3dump` flags for the whole batch
 
-On **Advanced** → **tpx3dump flags**, set for example `--eps-t` to `100` and
-tick `--disable-clustering`. The **Process** tab immediately shows an amber
-line, so a non-default run is never a surprise:
+On **Advanced** → **tpx3dump flags**, set for example `--eps-t` to `200ns` and
+tick `--disable-clustering`. On the **Process** tab the **Advanced flags**
+button turns from grey to yellow and reads **Advanced flags (2)**, so a
+non-default run is never a surprise. Click it for the list, one setting per
+row:
 
 ```
-Advanced: --eps-t 100, --disable-clustering
+--eps-t 200ns
+--disable-clustering
 ```
 
 **Preview commands** prints the exact command line of every queued file
 without running anything. On Windows it reads:
 
 ```
-wsl.exe -e /mnt/c/Luna/luna-tpx3-ubuntu/bin/tpx3dump process -i '/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3' -o '/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5' --eps-t 100 --disable-clustering
+wsl.exe -e /mnt/c/Luna/luna-tpx3-ubuntu/bin/tpx3dump process -i '/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3' -o '/mnt/d/tpx3cam data/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5' --eps-t 200ns --disable-clustering
 ```
 
-Any flag without its own control goes in **extra arguments**. **Check install**
-prints `tpx3dump process --help`, the authoritative list for your Luna version.
+Every `tpx3dump process` option has its own control, grouped as *Detector and
+timing*, *Clustering*, *Output file*, *Timewalk* and *Performance and
+logging*. Each has a one-line note beside it; hover it for the details and
+`tpx3dump`'s default. A few worth knowing:
+
+- `--eps-t` and `--time-bin-interval` take a unit: `200ns`, `0.5s`. A bare
+  number is refused before anything runs.
+- `--layout` must match the detector: `single`, `quad` (2x2) or `octal` (2x4).
+- Leaving `--tof-tdc-reference` unticked means no ToF at all, not a default edge.
+- `--num-time-bins` and `--time-bin-interval` trade speed against memory; they
+  do not change the output.
+- `--raw-only` skips sorting and clustering; `--disable-clustering` still sorts.
+- The Blosc compression algorithms need the `hdf5plugin` package for h5py, and
+  so for the Inspect tab, to read the file. `Deflate` works anywhere.
+
+**extra arguments** is passed verbatim after them, for anything a newer Luna
+adds. **Check install** prints `tpx3dump process --help`, the authoritative
+list for your Luna version.
 
 ### 6. Redo some files, not all
 
@@ -223,7 +245,7 @@ When outputs already exist, **Run queue** skips them. To redo particular
 files, tick **Overwrite** on their rows in **Files found**. The checkbox in the
 column header ticks or clears every row whose output exists. Untick **Skip
 files whose output already exists** on the Advanced tab to overwrite
-everything; the amber line then says `OVERWRITING existing output`.
+everything; **Advanced flags** then lists `OVERWRITING existing output`.
 
 ### 7. Build the batch on Windows, run it on a Linux machine
 
@@ -247,7 +269,7 @@ IN_ROOT='/mnt/d/tpx3cam data'
 OUT_ROOT=/mnt/d/processed
 
 mkdir -p "$(dirname "$OUT_ROOT"/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5)"
-"$TPX3DUMP" process -i "$IN_ROOT"/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3 -o "$OUT_ROOT"/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5 --eps-t 100 --disable-clustering
+"$TPX3DUMP" process -i "$IN_ROOT"/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/raw/fCqk_000000.tpx3 -o "$OUT_ROOT"/data_DCR_07.08.2026/Measurement_Aug_07_2026_12h52m45s/2026-08-07_12-52-45_DCR-0V-gain_fCqk_000000.hdf5 --eps-t 200ns --disable-clustering
 ...
 ```
 
@@ -617,7 +639,12 @@ Luna is configured:
 |---|---|
 | **Process** | The whole everyday job: add input, press Run, watch the log. Deliberately has nothing else on it. |
 | **Advanced** | Luna folder, output placement, renaming, `tpx3dump` flags, command preview, script export. All optional. |
-| **Inspect HDF5** | Look inside a result — datasets, counts, ToA range, TDC edges, six plots, and the button that writes the TDC columns. See below. |
+| **Inspect HDF5** | Look inside a result — datasets, counts, ToA range, TDC edges, the rows themselves, six plots, and the button that writes the TDC columns. See below. |
+
+**Help** in the menu bar above the tabs (or F1) opens a Help window: what every
+tab, option and `tpx3dump` flag does, the name-template placeholders, the
+file's columns and units, TDC, and troubleshooting, with a Find box. Its
+topics are also listed in the menu itself.
 
 Left alone, the Process tab runs exactly
 
@@ -625,15 +652,15 @@ Left alone, the Process tab runs exactly
 tpx3dump process -i NAME.tpx3 -o NAME.hdf5
 ```
 
-per queued file, writing the `.hdf5` next to its `.tpx3`. Any deviation raises
-an amber summary line on the Process tab — relocation, renaming, overwriting,
-and every flag passed. Silently renamed or relocated output is the one surprise
+per queued file, writing the `.hdf5` next to its `.tpx3`. Any deviation turns
+the **Advanced flags** button on the Process tab yellow, and a click lists it
+all — relocation, renaming, overwriting, and every flag passed. Silently renamed or relocated output is the one surprise
 worth never having.
 
 Folder scanning, Rescan, output placement and the rest are walked through in
 [What it can do](#what-it-can-do-worked-examples).
 
-Theme is a Light/Dark pair of buttons in the header, remembered between runs.
+The theme is in the **View** menu (light or dark), remembered between runs.
 
 ## Name templates
 
@@ -687,6 +714,17 @@ each opens in its own modeless window — several can be compared side by side.
 | **ToT, cluster total** | `Clusters` `sum_tot` | ~300 bins snapped to 25 ns ticks, log y |
 | **Cluster size histogram** | `Clusters` `size` | 40 bins over 0–40, linear y |
 | **Time since TDC edge** | `Clusters` `ctoa` − `TDCEvents` | 200 bins over one trigger period, log y |
+
+### Looking at the rows themselves
+
+Double-click a dataset in the **Datasets** table (or select it and press
+**View rows...**) to open its rows in a window of their own. It scrolls
+through the whole dataset, not just the head: only the rows on screen are
+read, a chunk at a time, so a 300-million-row `PixelHits` opens as fast as a
+small one. **Row**, **First** and **Last** jump anywhere; the row numbers count
+from 0, as h5py does. Values are shown as stored. Hover a column header for its
+type and unit (`toa`, `ctoa`, `tof` in 100 fs ticks, `tot` in ns), and Ctrl+C
+copies the selected cells as tab-separated text.
 
 ### ctot is the peak pixel, not the cluster total
 
@@ -881,6 +919,7 @@ src/
   luna_tpx3_gui/
     functions/            Qt-free core -- importable without PySide6
       backend.py            native / WSL detection, path translation, drive mounts
+      flags.py              the tpx3dump flags: notes, defaults, argv, checks
       naming.py             metadata -> name templates, the Job record
       tdc.py                /TDCEvents dedup, TDC columns, read_with_tdc()
       config.py             ~/.luna_tpx3_gui_qt.json
@@ -888,6 +927,8 @@ src/
       common.py             app identity, icon path
     gui/                  the Qt application
       main_window.py        Process, Advanced and Inspect HDF5 tabs
+      dataset_view.py       the scrollable row viewer for one dataset
+      help_window.py        the Help window (Help menu, F1)
       models.py, widgets.py, style.py
     icon/                 app icon
 tests/                    pytest suite for the Qt-free core

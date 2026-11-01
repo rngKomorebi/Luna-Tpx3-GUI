@@ -23,6 +23,8 @@ PALETTES = {
         alert_bg="#fef2f2", alert_border="#fecaca",
         tab_active_bg="#f9fafb", tab_active_fg="#111827",
         selection="#cfe4ff", grid="#e5e7eb",
+        flag_bg="#fde047", flag_border="#eab308", flag_fg="#422006",
+        heading="#0b5cad",
     ),
     "dark": dict(
         surface="#131315",
@@ -38,6 +40,8 @@ PALETTES = {
         alert_bg="#202022", alert_border="#48484a",
         tab_active_bg="#353537", tab_active_fg="#ffffff",
         selection="#0a3a66", grid="#2a2a2c",
+        flag_bg="#ffd60a", flag_border="#e6c000", flag_fg="#1c1c1e",
+        heading="#5ac8fa",
     ),
 }
 
@@ -314,6 +318,16 @@ def build_qss(pal: dict, sans: str, mono: str) -> str:
         background: {pal['outline_variant']};
         margin: 5px 0;
     }}
+    /* Advanced flags on the Process tab: grey while the run is plain,
+       yellow as soon as anything deviates from it. */
+    QPushButton[adv="off"] {{ color: {pal['text_faint']}; }}
+    QPushButton[adv="on"] {{
+        background: {pal['flag_bg']};
+        border-color: {pal['flag_border']};
+        color: {pal['flag_fg']};
+        font-weight: 600;
+    }}
+    QPushButton[adv="on"]:hover {{ border-color: {pal['flag_fg']}; }}
     QPushButton[danger="true"]:hover {{
         background: {pal['surface_container_high']};
         border-color: {pal['error']};
@@ -330,6 +344,64 @@ def build_qss(pal: dict, sans: str, mono: str) -> str:
     QListWidget::item:selected {{
         background: {pal['selection']};
         color: {pal['text']};
+    }}
+
+    /* ---- menu bar ------------------------------------------------------ */
+    QMenuBar {{
+        background: {pal['surface']};
+        color: {pal['text']};
+        padding: 2px 6px;
+    }}
+    QMenuBar::item {{
+        background: transparent;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }}
+    QMenuBar::item:selected, QMenuBar::item:pressed {{
+        background: {pal['surface_container_high']};
+    }}
+    QMenu {{
+        background: {pal['surface_container_low']};
+        color: {pal['text']};
+        border: 1px solid {pal['outline_variant']};
+        padding: 4px;
+    }}
+    QMenu::item {{ padding: 5px 28px 5px 12px; border-radius: 5px; }}
+    QMenu::item:selected {{ background: {pal['selection']}; color: {pal['text']}; }}
+    QMenu::separator {{
+        height: 1px;
+        background: {pal['outline_variant']};
+        margin: 4px 8px;
+    }}
+
+    /* ---- help ---------------------------------------------------------- */
+    /* The section list reads as navigation, not as a list of paths. */
+    QListWidget[nav="true"] {{
+        font-family: "{sans}";
+        font-size: 11pt;
+        padding: 4px 0;
+    }}
+    QListWidget[nav="true"]::item {{
+        padding: 6px 12px;
+        border-left: 3px solid transparent;
+    }}
+    QListWidget[nav="true"]::item:hover {{
+        background: {pal['surface_container_high']};
+    }}
+    QListWidget[nav="true"]::item:selected {{
+        background: {pal['selection']};
+        color: {pal['text']};
+        border-left: 3px solid {pal['heading']};
+    }}
+    QTextBrowser {{
+        font-family: "{sans}";
+        font-size: 11pt;
+        padding: 6px 10px;
+        background: {pal['surface_container_low']};
+        border: 1px solid {pal['outline_variant']};
+        border-radius: 8px;
+        selection-background-color: {pal['primary']};
+        selection-color: {pal['on_primary']};
     }}
     QToolTip {{
         background: {pal['surface_container_highest']};

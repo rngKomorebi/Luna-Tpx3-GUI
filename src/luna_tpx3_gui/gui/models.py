@@ -18,8 +18,7 @@ STATUS_COLOUR = {
 
 
 class JobModel(QAbstractTableModel):
-    HEADERS = ("Status", "Input file", "Size", "Output file", "Overwrite",
-               "Measurement folder")
+    HEADERS = ("Status", "Input file", "Size", "Output file", "Overwrite")
     OVER = 4                  # the Overwrite column
 
     def __init__(self, window):
@@ -63,9 +62,7 @@ class JobModel(QAbstractTableModel):
                     return "?"
             if col == 3:
                 return job.dst.name if job.dst else ""
-            if col == self.OVER:
-                return ""      # the checkbox is the whole content of this cell
-            return (job.ctx.get("campaign", "") + " / " + job.ctx.get("measurement", ""))
+            return ""          # Overwrite: the checkbox is the whole cell
         if role == Qt.ItemDataRole.CheckStateRole and col == self.OVER:
             # Only offer a box where there is actually something to clobber.
             if not self.w.job_clobbers(job):
